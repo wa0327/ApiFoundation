@@ -14,8 +14,6 @@ namespace ApiFoundation.Services
         {
         }
 
-        public TimeSpan TimestampTimeout { get; set; }
-
         public event EventHandler<HttpContentEventArgs> RequestDecrypting;
 
         public event EventHandler<HttpContentEventArgs> RequestDecrypted;

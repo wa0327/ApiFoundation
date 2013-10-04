@@ -5,10 +5,7 @@ using System.Text;
 
 namespace ApiFoundation.Security.Cryptography
 {
-    internal interface ICryptoProvider
+    public sealed class InvalidSignatureException : Exception
     {
-        string Encrypt(string content);
-
-        string Decrypt(string content);
     }
 }

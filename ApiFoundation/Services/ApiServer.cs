@@ -85,26 +85,24 @@ namespace ApiFoundation.Services
 
         protected virtual void OnException(HttpActionExecutedContext context)
         {
-            if (this.Exception == null)
+            if (this.Exception != null)
             {
-                return;
+                var e = new ExceptionEventArgs(context.Exception);
+                this.Exception(this, e);
+
+                if (e.IsBusinessError)
+                {
+                    var bizError = new HttpError(e.ErrorMessage);
+                    bizError["ErrorCode"] = e.ErrorCode;
+                    context.Response = context.Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, bizError);
+                    return;
+                }
             }
 
-            var e = new ExceptionEventArgs(context.Exception);
-            this.Exception(this, e);
-
-            if (e.IsBusinessError)
-            {
-                var error = new HttpError(e.ErrorMessage);
-                error["ErrorCode"] = e.ErrorCode;
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, error);
-            }
-            else
-            {
-                var error = new HttpError(e.Exception.Message);
-                error["ErrorType"] = e.Exception.GetType().FullName;
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, error);
-            }
+            // expression of other errors
+            var error = new HttpError(context.Exception.Message);
+            error["ErrorType"] = context.Exception.GetType().FullName;
+            context.Response = context.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, error);
         }
 
         protected virtual void OnRegisterMessageHandlers(Collection<DelegatingHandler> handlers)

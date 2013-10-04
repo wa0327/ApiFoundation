@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
@@ -43,9 +46,11 @@
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.dll</HintPath>
     </Reference>
@@ -55,6 +60,7 @@
     <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll</HintPath>
@@ -70,24 +76,22 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\InvocationNotAcceptable.cs" />
     <Compile Include="Net\Http\MessageInterceptingHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Security\Cryptography\AesHttpContentEncryptor.cs" />
-    <Compile Include="Security\Cryptography\DefaultKeyProvider.cs" />
-    <Compile Include="Security\Cryptography\FakeHttpContentEncryptor.cs" />
-    <Compile Include="Security\Cryptography\IHttpContentEncryptor.cs" />
-    <Compile Include="Security\Cryptography\IKeyProvider.cs" />
+    <Compile Include="Security\Cryptography\DefaultEncryptor.cs" />
+    <Compile Include="Security\Cryptography\IEncryptor.cs" />
+    <Compile Include="Security\Cryptography\InvalidSignatureException.cs" />
+    <Compile Include="Services\SecuredMessage.cs" />
     <Compile Include="Services\ApiServer.cs" />
     <Compile Include="Services\BadInvocationException.cs" />
     <Compile Include="Services\ExceptionEventArgs.cs" />
     <Compile Include="Services\HttpContentEventArgs.cs" />
     <Compile Include="Services\HttpServiceException.cs" />
     <Compile Include="Services\InvocationNotAcceptableException.cs" />
-    <Compile Include="Security\Cryptography\ICryptoProvider.cs" />
     <Compile Include="Services\HttpRequestEventArgs.cs" />
     <Compile Include="Services\HttpResponseEventArgs.cs" />
     <Compile Include="Services\IApiClient.cs" />

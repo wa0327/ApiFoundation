@@ -17,6 +17,7 @@ namespace ApiFoundation.Services
     {
         #region 起動 Web API server
 
+        private static IApiServer apiServer;
         private static HttpSelfHostServer server;
 
         [ClassInitialize]
@@ -24,7 +25,7 @@ namespace ApiFoundation.Services
         {
             var config = new HttpSelfHostConfiguration("http://localhost:8591");
 
-            var apiServer = new ApiServer(config);
+            apiServer = new ApiServer(config);
             apiServer.RequestReceived += (sender, e) =>
             {
                 if (e.Request.Content != null)
@@ -39,15 +40,6 @@ namespace ApiFoundation.Services
                 {
                     var content = e.Response.Content.ReadAsStringAsync().Result;
                     Trace.TraceInformation("Sending response: {0}", content);
-                }
-            };
-            apiServer.Exception += (sender, e) =>
-            {
-                if (e.Exception is BusinessErrorException)
-                {
-                    e.IsBusinessError = true;
-                    e.ErrorCode = "7533967";
-                    e.ErrorMessage = "中毒太深";
                 }
             };
 
@@ -142,6 +134,9 @@ namespace ApiFoundation.Services
                     {
                         return new InvalidModelRequest
                         {
+                            UserId = null,
+                            BackyardId = null,
+                            CatSubIds = null,
                         };
                     },
                     null
@@ -152,6 +147,7 @@ namespace ApiFoundation.Services
             catch (BadInvocationException ex)
             {
                 Assert.IsNotNull(ex.ModelState);
+                Assert.AreEqual("The UserId field is required.", ex.ModelState["request.UserId"][0]);
                 Assert.AreEqual("The BackyardId field is required.", ex.ModelState["request.BackyardId"][0]);
                 Assert.AreEqual("The CatSubIds field is required.", ex.ModelState["request.CatSubIds"][0]);
             }
@@ -160,6 +156,14 @@ namespace ApiFoundation.Services
         [TestMethod]
         public void ApiServerTest_BusinessError()
         {
+            EventHandler<ExceptionEventArgs> exceptionHandler = (sender, e) =>
+                {
+                    e.IsBusinessError = true;
+                    e.ErrorCode = "7533967";
+                    e.ErrorMessage = "中毒太深";
+                };
+
+            apiServer.Exception += exceptionHandler;
             try
             {
                 this.client.Post<object, object>(
@@ -174,6 +178,10 @@ namespace ApiFoundation.Services
             {
                 Assert.AreEqual("中毒太深", ex.Message);
                 Assert.AreEqual("7533967", ex.ErrorCode);
+            }
+            finally
+            {
+                apiServer.Exception -= exceptionHandler;
             }
         }
 

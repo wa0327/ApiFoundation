@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Web.Http;
-using ApiFoundation.Entities;
 using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Services

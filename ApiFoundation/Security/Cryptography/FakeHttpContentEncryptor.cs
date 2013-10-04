@@ -7,9 +7,9 @@ using System.Text;
 
 namespace ApiFoundation.Security.Cryptography
 {
-    public class FakeHttpContentEncryptor : IHttpContentEncryptor
+    public class FakeHttpContentEncryptor : IMessageEncryptor
     {
-        HttpContent IHttpContentEncryptor.Encrypt(HttpContent originContent)
+        HttpContent IMessageEncryptor.Encrypt(HttpContent originContent)
         {
             if (originContent == null)
             {
@@ -33,7 +33,7 @@ namespace ApiFoundation.Security.Cryptography
             return encodedContent;
         }
 
-        HttpContent IHttpContentEncryptor.Decrypt(HttpContent encryptedContent)
+        HttpContent IMessageEncryptor.Decrypt(HttpContent encryptedContent)
         {
             if (encryptedContent == null)
             {

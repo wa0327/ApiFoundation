@@ -10,18 +10,18 @@ using System.Web.Http.Tracing;
 
 namespace ApiFoundation.Security.Cryptography
 {
-    public class AesHttpContentEncryptor : IHttpContentEncryptor
+    public class AesEncryptor : IEncryptor
     {
         private readonly IKeyProvider keyProvider;
         private readonly SymmetricAlgorithm algorithm;
 
-        public AesHttpContentEncryptor(IKeyProvider keyProvider)
+        public AesEncryptor(IKeyProvider keyProvider)
         {
             this.keyProvider = keyProvider;
             this.algorithm = new AesManaged();
         }
 
-        HttpContent IHttpContentEncryptor.Encrypt(HttpContent originContent)
+        HttpContent IEncryptor.Encrypt(HttpContent originContent)
         {
             if (originContent == null)
             {
@@ -56,7 +56,7 @@ namespace ApiFoundation.Security.Cryptography
             }
         }
 
-        HttpContent IHttpContentEncryptor.Decrypt(HttpContent encryptedContent)
+        HttpContent IEncryptor.Decrypt(HttpContent encryptedContent)
         {
             if (encryptedContent == null)
             {

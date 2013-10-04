@@ -5,12 +5,17 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
+using ApiFoundation.Security.Cryptography;
 
 namespace ApiFoundation.Services
 {
     public class SecuredApiClient : ApiClient, ISecuredApiClient
     {
-        public TimeSpan TimestampTimeout { get; set; }
+        private readonly IEncryptor contentEncryptor;
+
+        public SecuredApiClient()
+        {
+        }
 
         public event EventHandler<HttpContentEventArgs> RequestEncrypting;
 
