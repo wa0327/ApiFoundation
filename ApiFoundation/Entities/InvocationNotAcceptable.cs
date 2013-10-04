@@ -7,8 +7,6 @@ namespace ApiFoundation.Entities
 {
     internal sealed class InvocationNotAcceptable
     {
-        public string ApiRequestNum { get; set; }
-
         public string ReturnCode { get; set; }
 
         public string ErrorMessage { get; set; }

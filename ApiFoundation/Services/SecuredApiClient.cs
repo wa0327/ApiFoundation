@@ -10,6 +10,8 @@ namespace ApiFoundation.Services
 {
     public class SecuredApiClient : ApiClient, ISecuredApiClient
     {
+        public TimeSpan TimestampTimeout { get; set; }
+
         public event EventHandler<HttpContentEventArgs> RequestEncrypting;
 
         public event EventHandler<HttpContentEventArgs> RequestEncrypted;

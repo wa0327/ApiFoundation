@@ -62,16 +62,6 @@ namespace ApiFoundation.Services
         TimeSpan Timeout { set; get; }
 
         /// <summary>
-        /// Request 已送出
-        /// </summary>
-        event EventHandler<HttpRequestEventArgs> SendingRequest;
-
-        /// <summary>
-        /// Response 已接收
-        /// </summary>
-        event EventHandler<HttpResponseEventArgs> ResponseReceived;
-
-        /// <summary>
         /// 送出 HTTP 要求
         /// </summary>
         /// <typeparam name="TRequest">The type of the request.</typeparam>
@@ -88,5 +78,15 @@ namespace ApiFoundation.Services
         TResponse Send<TRequest, TResponse>(HttpMethod method, string requestUri, TRequest request)
             where TRequest : class
             where TResponse : class;
+
+        /// <summary>
+        /// Request 已送出
+        /// </summary>
+        event EventHandler<HttpRequestEventArgs> SendingRequest;
+
+        /// <summary>
+        /// Response 已接收
+        /// </summary>
+        event EventHandler<HttpResponseEventArgs> ResponseReceived;
     }
 }

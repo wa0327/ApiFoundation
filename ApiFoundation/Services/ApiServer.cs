@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Text;
@@ -13,8 +14,16 @@ using ApiFoundation.Web.Http.Filters;
 
 namespace ApiFoundation.Services
 {
+    /// <summary>
+    /// 起始 API server 基本設定。
+    /// </summary>
+    /// <remarks>
+    /// 請將此設定套件放置於設置其它 HttpConfiguration 邏輯之前。
+    /// </remarks>
     public class ApiServer : IApiServer
     {
+        private ILogWriter logWriter;
+
         public ApiServer(HttpConfiguration configuration)
         {
             this.OnRegisterMessageHandlers(configuration.MessageHandlers);
@@ -26,31 +35,23 @@ namespace ApiFoundation.Services
 
         public ILogWriter LogWriter
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return this.logWriter; }
             set
             {
-                throw new NotImplementedException();
-            }
-        }
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
 
-        public IExceptionHandler ExceptionHandler
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
+                this.logWriter = value;
             }
         }
 
         public event EventHandler<HttpRequestEventArgs> RequestReceived;
 
         public event EventHandler<HttpResponseEventArgs> SendingResponse;
+
+        public event EventHandler<ExceptionEventArgs> Exception;
 
         protected virtual void OnRequestReceived(HttpRequestMessage request)
         {
@@ -70,15 +71,50 @@ namespace ApiFoundation.Services
             }
         }
 
+        protected virtual void OnActionExecuting(HttpActionContext context)
+        {
+            if (!context.ModelState.IsValid)
+            {
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.BadRequest, context.ModelState);
+            }
+        }
+
+        protected virtual void OnActionExecuted(HttpActionExecutedContext context)
+        {
+        }
+
+        protected virtual void OnException(HttpActionExecutedContext context)
+        {
+            if (this.Exception == null)
+            {
+                return;
+            }
+
+            var e = new ExceptionEventArgs(context.Exception);
+            this.Exception(this, e);
+
+            if (e.IsBusinessError)
+            {
+                var error = new HttpError(e.ErrorMessage);
+                error["ErrorCode"] = e.ErrorCode;
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, error);
+            }
+            else
+            {
+                var error = new HttpError(e.Exception.Message);
+                error["ErrorType"] = e.Exception.GetType().FullName;
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, error);
+            }
+        }
+
         protected virtual void OnRegisterMessageHandlers(Collection<DelegatingHandler> handlers)
         {
-            var interceptor = new MessageInterceptingHandler
+            // 連接 http message 處理程序
+            handlers.Add(new MessageInterceptingHandler
             {
                 ProcessRequestDelegate = request => this.OnRequestReceived(request),
                 ProcessResponseDelegate = response => this.OnSendingResponse(response),
-            };
-
-            handlers.Add(interceptor);
+            });
         }
 
         protected virtual void OnRegisterServices(ServicesContainer services)
@@ -87,12 +123,31 @@ namespace ApiFoundation.Services
 
         protected virtual void OnRegisterFilters(HttpFilterCollection filters)
         {
-            filters.Add(new InvalidModelFilterAttribute());
+            // 連接 model validation 處理程序
+            filters.Add(new ActionInterceptingFilter
+            {
+                ActionExecutingDelegate = context => this.OnActionExecuting(context),
+                ActionExecutedDelegate = context => this.OnActionExecuted(context),
+            });
+
+            // 連接 exception 處理程序
+            filters.Add(new ExceptionInterceptingFilter
+            {
+                ExceptionDelegate = context => this.OnException(context),
+            });
         }
 
         protected virtual void OnRegisterRoute(HttpRouteCollection routes)
         {
-            routes.MapHttpRoute("Timestamp", "api/TimeStampService", new { controller = "TimestampController" });
+            // 相容於舊版的 ApiFoundation
+            routes.MapHttpRoute(
+                "TimeStampService",
+                "api/TimeStampService/GetTimeStamp",
+                defaults: new
+                {
+                    controller = "Timestamp",
+                    action = "Get"
+                });
         }
 
         protected virtual void OnRegisterFormatters(MediaTypeFormatterCollection formatters)

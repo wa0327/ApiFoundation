@@ -11,6 +11,11 @@ namespace ApiFoundation.Services
     public interface ISecuredApiServer : IApiServer
     {
         /// <summary>
+        /// 時戳有效時間。
+        /// </summary>
+        TimeSpan TimestampTimeout { get; set; }
+
+        /// <summary>
         /// Request 解密前
         /// </summary>
         event EventHandler<HttpContentEventArgs> RequestDecrypting;

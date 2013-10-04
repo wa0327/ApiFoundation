@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web.Http;
 using ApiFoundation.Entities;
+using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Services
 {
@@ -11,12 +13,21 @@ namespace ApiFoundation.Services
     /// </summary>
     public sealed class BadInvocationException : Exception
     {
-        internal BadInvocationException(Dictionary<string, IEnumerable<string>> source)
+        private readonly HttpError httpError;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BadInvocationException"/> class.
+        /// </summary>
+        /// <param name="httpError">The HTTP error.</param>
+        internal BadInvocationException(HttpError httpError)
+            : base(httpError.Message)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException("source");
-            }
+            this.httpError = httpError;
+        }
+
+        public JObject ModelState
+        {
+            get { return (JObject)this.httpError["ModelState"]; }
         }
     }
 }

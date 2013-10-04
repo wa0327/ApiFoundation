@@ -19,14 +19,6 @@ namespace ApiFoundation.Services
         ILogWriter LogWriter { get; set; }
 
         /// <summary>
-        /// Gets or sets the exception handler.
-        /// </summary>
-        /// <value>
-        /// The exception handler.
-        /// </value>
-        IExceptionHandler ExceptionHandler { get; set; }
-
-        /// <summary>
         /// Request 已接收
         /// </summary>
         event EventHandler<HttpRequestEventArgs> RequestReceived;
@@ -35,5 +27,10 @@ namespace ApiFoundation.Services
         /// Response 已回傳
         /// </summary>
         event EventHandler<HttpResponseEventArgs> SendingResponse;
+
+        /// <summary>
+        /// 當例外發生時觸發
+        /// </summary>
+        event EventHandler<ExceptionEventArgs> Exception;
     }
 }

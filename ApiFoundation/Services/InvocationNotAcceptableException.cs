@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web.Http;
 using ApiFoundation.Entities;
 
 namespace ApiFoundation.Services
@@ -11,33 +12,22 @@ namespace ApiFoundation.Services
     /// </summary>
     public sealed class InvocationNotAcceptableException : Exception
     {
-        private readonly InvocationNotAcceptable source;
+        private readonly HttpError httpError;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InvocationNotAcceptableException" /> class.
         /// </summary>
-        /// <param name="source">The source.</param>
-        internal InvocationNotAcceptableException(InvocationNotAcceptable source)
+        /// <param name="httpError">The HTTP error.</param>
+        /// <exception cref="System.ArgumentNullException">errorCode</exception>
+        internal InvocationNotAcceptableException(HttpError httpError)
+            : base(httpError.Message)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException("source");
-            }
-
-            this.source = source;
+            this.httpError = httpError;
         }
 
-        public override string Message
+        public string ErrorCode
         {
-            get { return this.source.ErrorMessage; }
-        }
-
-        /// <summary>
-        /// Return code
-        /// </summary>
-        public string ReturnCode
-        {
-            get { return this.source.ReturnCode; }
+            get { return (string)this.httpError["ErrorCode"]; }
         }
     }
 }

@@ -6,8 +6,11 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Web.Http;
+using System.Web.Http.ModelBinding;
 using ApiFoundation.Entities;
 using ApiFoundation.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Services
 {
@@ -96,17 +99,7 @@ namespace ApiFoundation.Services
             }
             catch (AggregateException exception) // AggregateException 屬於多工的例外，因為這裡不使用多工處理，所以應進一步取出原始例外。
             {
-                var inner = exception.InnerException;
-
-                if (inner is HttpRequestException)
-                {
-                    if (inner.InnerException != null)
-                    {
-                        throw inner.InnerException; // 丟出原始例外
-                    }
-
-                    throw inner;
-                }
+                throw exception.InnerException;
             }
 
             if (responseMessage.IsSuccessStatusCode)
@@ -116,19 +109,31 @@ namespace ApiFoundation.Services
             }
             else
             {
+                HttpError httpError = null;
+                try
+                {
+                    httpError = responseMessage.Content.ReadAsAsync<HttpError>().Result;
+                }
+                catch (Exception)
+                {
+                    var message = responseMessage.Content.ReadAsStringAsync().Result;
+                    throw new HttpRequestException(message);
+                }
+
+                // model state errors
                 if (responseMessage.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    var response = responseMessage.Content.ReadAsAsync<Dictionary<string, IEnumerable<string>>>().Result;
-                    throw new BadInvocationException(response);
+                    throw new BadInvocationException(httpError);
                 }
 
+                // business errors
                 if (responseMessage.StatusCode == HttpStatusCode.NotAcceptable)
                 {
-                    var response = responseMessage.Content.ReadAsAsync<InvocationNotAcceptable>().Result;
-                    throw new InvocationNotAcceptableException(response);
+                    throw new InvocationNotAcceptableException(httpError);
                 }
 
-                throw new HttpServiceException(responseMessage);
+                // other errors
+                throw new HttpServiceException(responseMessage.StatusCode, httpError);
             }
         }
 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using ApiFoundation.Utilities.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ApiFoundation.Services
@@ -45,18 +44,45 @@ namespace ApiFoundation.Services
             this.target.Dispose();
         }
 
+        [TestMethod]
+        public void ApiServerTest_NoServer()
+        {
+            try
+            {
+                this.target.Post<object, object>(
+                    "http://localhost:9876/api/NoController/NoAction",
+                    null,
+                    null);
+
+                Assert.Fail("Did not throw expected exception HttpRequestException.");
+            }
+            catch (HttpRequestException ex)
+            {
+                Assert.IsNotNull(ex.InnerException);
+                Assert.IsInstanceOfType(ex.InnerException, typeof(WebException));
+            }
+        }
+
         /// <summary>
         /// LMS API server 憑證有問題，所以應當收到 WebException 例外。
         /// </summary>
         [TestMethod]
-        [ExpectedException(typeof(WebException))]
         public void LmsApi_GetTimestamp_InvalidCertificate()
         {
-            target.Post<object, string>(
-                "https://lmsapi.eos.net.tw:8443/api/TimeStampService/GetTimeStamp",
-                () => null,
-                response => { }
-            );
+            try
+            {
+                this.target.Post<object, string>(
+                    "https://lmsapi.eos.net.tw:8443/api/TimeStampService/GetTimeStamp",
+                    null,
+                    null);
+
+                Assert.Fail("Did not throw expected exception HttpRequestException.");
+            }
+            catch (HttpRequestException ex)
+            {
+                Assert.IsNotNull(ex.InnerException);
+                Assert.IsInstanceOfType(ex.InnerException, typeof(WebException));
+            }
         }
 
         /// <summary>
@@ -69,11 +95,10 @@ namespace ApiFoundation.Services
             // 略過憑證檢查
             ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
-            target.Post<object, string>(
+            this.target.Post<object, string>(
                 "https://lmsapi.eos.net.tw:8443/api/TimeStampService/GetTimeStamp",
-                () => null,
-                response => { }
-            );
+                null,
+                null);
 
             // 復原
             ServicePointManager.ServerCertificateValidationCallback = null;
@@ -85,7 +110,7 @@ namespace ApiFoundation.Services
             // 略過憑證檢查
             ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
-            target.Get<object, string>(
+            this.target.Get<object, string>(
                 "https://lmsapi.eos.net.tw:8443/api/TimeStampService/GetTimeStamp",
                 () => null,
                 response =>
@@ -116,7 +141,7 @@ namespace ApiFoundation.Services
         [TestMethod]
         public void ErpApi_GetUserAuthority()
         {
-            target.Post<SomeRequest, SomeResponse>(
+            this.target.Post<SomeRequest, SomeResponse>(
                 "http://erpapi.self.monday:9999/api/User/GetAuthority",
                 () =>
                 {

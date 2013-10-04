@@ -7,16 +7,26 @@ using System.Web.Http;
 
 namespace ApiFoundation.Web.Http.Controllers
 {
-    internal class TimestampController : ApiController
+    public class TimestampController : ApiController
     {
         /// <summary>
         /// 提供timeStamp給client呼叫
         /// </summary>
         /// <returns>回傳timestamp字串,以明文格式回傳,不做加工處理</returns>
         [HttpGet]
-        internal string GetTimeStamp()
+        public string Get()
         {
             return DateTime.UtcNow.Ticks.ToString();
+        }
+
+        /// <summary>
+        /// 為了與舊版相容所提供的方法。
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet, Obsolete]
+        public string GetTimestamp()
+        {
+            return this.Get();
         }
     }
 }

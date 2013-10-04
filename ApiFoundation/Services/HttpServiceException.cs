@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Web.Http;
 
 namespace ApiFoundation.Services
 {
@@ -12,32 +13,47 @@ namespace ApiFoundation.Services
     /// </summary>
     public sealed class HttpServiceException : Exception
     {
-        private readonly HttpResponseMessage responseMessage;
-        private readonly string message;
+        private readonly HttpStatusCode statusCode;
+        private readonly HttpError httpError;
 
-        internal HttpServiceException(HttpResponseMessage responseMessage)
+        internal HttpServiceException(HttpStatusCode statusCode, HttpError httpError)
+            : base(httpError.Message)
         {
-            if (responseMessage == null)
-            {
-                throw new ArgumentNullException("responseMessage");
-            }
-
-            this.responseMessage = responseMessage;
-
-            if (responseMessage.Content != null)
-            {
-                this.message = responseMessage.Content.ReadAsStringAsync().Result;
-            }
-        }
-
-        public override string Message
-        {
-            get { return this.message; }
+            this.statusCode = statusCode;
+            this.httpError = httpError;
         }
 
         public HttpStatusCode StatusCode
         {
-            get { return this.responseMessage.StatusCode; }
+            get { return this.statusCode; }
+        }
+
+        public string ErrorType
+        {
+            get
+            {
+                object errorType;
+                if (this.httpError.TryGetValue("ErrorType", out errorType))
+                {
+                    return (string)errorType;
+                }
+
+                return null;
+            }
+        }
+
+        public string MessageDetail
+        {
+            get
+            {
+                object detail;
+                if (this.httpError.TryGetValue("MessageDetail", out detail))
+                {
+                    return (string)detail;
+                }
+
+                return null;
+            }
         }
     }
 }
