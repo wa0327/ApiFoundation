@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundation", "ApiFoundation\ApiFoundation.csproj", "{0FC6D045-A7CE-45C0-84F1-3A2471C26060}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C24BB03-4E3C-42EC-83AB-5EEF851BC6A5}"
 	ProjectSection(SolutionItems) = preProject
 		ApiFoundation.vsmdi = ApiFoundation.vsmdi
@@ -10,14 +8,20 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundationTest", "ApiFoundationTest\ApiFoundationTest.csproj", "{32070334-2094-4C16-A5AD-8038BC73CD13}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{49BF8481-3516-43D3-8D5B-1F7268D38F2E}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{8AFF91D5-4C2C-4EAE-9989-A6258C0D9680}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F8CDC0FC-6D05-48B9-AE81-E6B4B7305E88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundation", "source\ApiFoundation\ApiFoundation.csproj", "{0FC6D045-A7CE-45C0-84F1-3A2471C26060}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundationTest", "test\ApiFoundationTest\ApiFoundationTest.csproj", "{32070334-2094-4C16-A5AD-8038BC73CD13}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -39,5 +43,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0FC6D045-A7CE-45C0-84F1-3A2471C26060} = {8AFF91D5-4C2C-4EAE-9989-A6258C0D9680}
+		{32070334-2094-4C16-A5AD-8038BC73CD13} = {F8CDC0FC-6D05-48B9-AE81-E6B4B7305E88}
 	EndGlobalSection
 EndGlobal

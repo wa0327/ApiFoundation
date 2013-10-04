@@ -71,7 +71,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ApiFoundation\ApiFoundation.csproj">
+    <ProjectReference Include="..\..\source\ApiFoundation\ApiFoundation.csproj">
       <Project>{0FC6D045-A7CE-45C0-84F1-3A2471C26060}</Project>
       <Name>ApiFoundation</Name>
     </ProjectReference>
