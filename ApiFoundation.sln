@@ -21,7 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F8CDC0FC-6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundation", "source\ApiFoundation\ApiFoundation.csproj", "{0FC6D045-A7CE-45C0-84F1-3A2471C26060}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundationTest", "test\ApiFoundationTest\ApiFoundationTest.csproj", "{32070334-2094-4C16-A5AD-8038BC73CD13}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundation.Test", "test\ApiFoundation.Test\ApiFoundation.Test.csproj", "{32070334-2094-4C16-A5AD-8038BC73CD13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundation.WebApp", "test\ApiFoundation.WebApp\ApiFoundation.WebApp.csproj", "{9F741FA4-FE0B-4FB5-9A93-62D99D0182E9}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -40,6 +42,10 @@ Global
 		{32070334-2094-4C16-A5AD-8038BC73CD13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32070334-2094-4C16-A5AD-8038BC73CD13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32070334-2094-4C16-A5AD-8038BC73CD13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F741FA4-FE0B-4FB5-9A93-62D99D0182E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F741FA4-FE0B-4FB5-9A93-62D99D0182E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F741FA4-FE0B-4FB5-9A93-62D99D0182E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F741FA4-FE0B-4FB5-9A93-62D99D0182E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,5 +53,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0FC6D045-A7CE-45C0-84F1-3A2471C26060} = {8AFF91D5-4C2C-4EAE-9989-A6258C0D9680}
 		{32070334-2094-4C16-A5AD-8038BC73CD13} = {F8CDC0FC-6D05-48B9-AE81-E6B4B7305E88}
+		{9F741FA4-FE0B-4FB5-9A93-62D99D0182E9} = {F8CDC0FC-6D05-48B9-AE81-E6B4B7305E88}
 	EndGlobalSection
 EndGlobal

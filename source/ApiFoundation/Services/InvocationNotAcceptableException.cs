@@ -15,7 +15,7 @@ namespace ApiFoundation.Services
         /// </summary>
         /// <param name="httpError">The HTTP error.</param>
         /// <exception cref="System.ArgumentNullException">errorCode</exception>
-        internal InvocationNotAcceptableException(HttpError httpError)
+        public InvocationNotAcceptableException(HttpError httpError)
             : base(httpError.Message)
         {
             this.httpError = httpError;

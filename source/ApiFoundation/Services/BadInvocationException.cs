@@ -15,7 +15,7 @@ namespace ApiFoundation.Services
         /// Initializes a new instance of the <see cref="BadInvocationException"/> class.
         /// </summary>
         /// <param name="httpError">The HTTP error.</param>
-        internal BadInvocationException(HttpError httpError)
+        public BadInvocationException(HttpError httpError)
             : base(httpError.Message)
         {
             this.httpError = httpError;

@@ -8,58 +8,32 @@ using ApiFoundation.Net.Http;
 
 namespace ApiFoundation.Services
 {
-    public class ApiClient : IApiClient
+    public class ApiClient : IDisposable
     {
         private readonly HttpClient httpClient;
-        private MediaTypeFormatter mediaFormatter;
+        private readonly MediaTypeFormatter mediaFormatter;
 
-        public ApiClient()
+        public ApiClient(HttpClient httpClient, MediaTypeFormatter formatter)
         {
-            var handler = this.CreateMessageHandler();
-
-            this.httpClient = new HttpClient(handler, true);
-            this.mediaFormatter = new JsonMediaTypeFormatter(); // default is Json.
-        }
-
-        public ILogWriter LogWriter
-        {
-            get
+            if (httpClient == null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException("httpClient");
             }
-            set
+
+            if (formatter == null)
             {
-                throw new NotImplementedException();
+                throw new ArgumentNullException("formatter");
             }
+
+            httpClient.InsertHandler(this.CreateMessageInterceptor());
+
+            this.httpClient = httpClient;
+            this.mediaFormatter = formatter;
         }
 
-        public MediaTypeFormatter MediaFormatter
+        public ApiClient(HttpClient httpClient)
+            : this(httpClient, new JsonMediaTypeFormatter())
         {
-            get { return this.mediaFormatter; }
-            set { this.mediaFormatter = value; }
-        }
-
-        public Uri BaseAddress
-        {
-            get { return this.httpClient.BaseAddress; }
-            set { this.httpClient.BaseAddress = value; }
-        }
-
-        public HttpRequestHeaders DefaultRequestHeaders
-        {
-            get { return this.httpClient.DefaultRequestHeaders; }
-        }
-
-        public long MaxResponseContentBufferSize
-        {
-            get { return this.httpClient.MaxResponseContentBufferSize; }
-            set { this.httpClient.MaxResponseContentBufferSize = value; }
-        }
-
-        public TimeSpan Timeout
-        {
-            get { return this.httpClient.Timeout; }
-            set { this.httpClient.Timeout = value; }
         }
 
         public event EventHandler<HttpRequestEventArgs> SendingRequest;
@@ -71,6 +45,20 @@ namespace ApiFoundation.Services
             this.httpClient.Dispose();
         }
 
+        /// <summary>
+        /// 送出 HTTP 要求
+        /// </summary>
+        /// <typeparam name="TRequest">The type of the request.</typeparam>
+        /// <typeparam name="TResponse">The type of the response.</typeparam>
+        /// <param name="method">The method.</param>
+        /// <param name="requestUri">The request URI.</param>
+        /// <param name="request">The request.</param>
+        /// <returns>
+        /// HTTP 回應
+        /// </returns>
+        /// <exception cref="ApiFoundation.Services.BadInvocationException">當呼叫端送出的格式有問題時擲出。</exception>
+        /// <exception cref="ApiFoundation.Services.InvocationNotAcceptableException">當被呼叫端發生商業邏輯錯誤時擲出。</exception>
+        /// <exception cref="ApiFoundation.Services.HttpServiceException">當被呼叫端發生非商業邏輯錯誤時擲出。</exception>
         public TResponse Send<TRequest, TResponse>(HttpMethod method, string requestUri, TRequest request)
             where TRequest : class
             where TResponse : class
@@ -131,32 +119,27 @@ namespace ApiFoundation.Services
             }
         }
 
-        protected virtual void OnSendingRequest(HttpRequestMessage request)
+        protected virtual void OnSendingRequest(HttpRequestEventArgs e)
         {
             if (this.SendingRequest != null)
             {
-                var e = new HttpRequestEventArgs(request);
                 this.SendingRequest(this, e);
             }
         }
 
-        protected virtual void OnResponseReceived(HttpResponseMessage response)
+        protected virtual void OnResponseReceived(HttpResponseEventArgs e)
         {
             if (this.ResponseReceived != null)
             {
-                var e = new HttpResponseEventArgs(response);
                 this.ResponseReceived(this, e);
             }
         }
 
-        private MessageProcessingHandler CreateMessageHandler()
+        private DelegatingHandler CreateMessageInterceptor()
         {
-            var interceptor = new MessageInterceptingHandler
-            {
-                ProcessRequestDelegate = request => this.OnSendingRequest(request),
-                ProcessResponseDelegate = response => this.OnResponseReceived(response),
-                InnerHandler = new HttpClientHandler(),
-            };
+            var interceptor = new MessageInterceptor();
+            interceptor.ProcessingRequest += (sender, e) => this.OnSendingRequest(e);
+            interceptor.ProcessingResponse += (sender, e) => this.OnResponseReceived(e);
 
             return interceptor;
         }

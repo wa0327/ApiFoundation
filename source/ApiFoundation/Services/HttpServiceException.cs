@@ -16,7 +16,7 @@ namespace ApiFoundation.Services
         private readonly HttpStatusCode statusCode;
         private readonly HttpError httpError;
 
-        internal HttpServiceException(HttpStatusCode statusCode, HttpError httpError)
+        public HttpServiceException(HttpStatusCode statusCode, HttpError httpError)
             : base(httpError.Message)
         {
             this.statusCode = statusCode;
