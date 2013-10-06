@@ -9,7 +9,7 @@ namespace ApiFoundation.Utility
 {
     internal sealed class CryptoServiceWrapper : IDisposable
     {
-        private readonly CryptoService service;
+        private readonly DefaultCryptoService service;
 
         internal CryptoServiceWrapper()
         {
@@ -46,7 +46,7 @@ namespace ApiFoundation.Utility
                 Key = Encoding.UTF8.GetBytes("1234567890"),
             };
 
-            this.service = new CryptoService(symmetricAlgorithm, hashAlgorithm);
+            this.service = new DefaultCryptoService(symmetricAlgorithm, hashAlgorithm);
         }
 
         public void Dispose()
@@ -54,7 +54,7 @@ namespace ApiFoundation.Utility
             this.service.Dispose();
         }
 
-        public static implicit operator CryptoService(CryptoServiceWrapper source)
+        public static implicit operator DefaultCryptoService(CryptoServiceWrapper source)
         {
             return source.service;
         }

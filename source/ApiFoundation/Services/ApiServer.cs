@@ -39,16 +39,7 @@ namespace ApiFoundation.Services
                 handler = new HttpControllerDispatcher(configuration);
             }
 
-            this.OnCreatingHttpRoute(configuration, name, routeTemplate, defaults, constraints, handler);
-        }
-
-        public event EventHandler<HttpRequestEventArgs> RequestReceived;
-
-        public event EventHandler<HttpResponseEventArgs> SendingResponse;
-
-        protected virtual void OnCreatingHttpRoute(HttpConfiguration configuration, string name, string routeTemplate, object defaults, object constraints, HttpMessageHandler handler)
-        {
-            var interceptor = new MessageInterceptor
+            var interceptor = new MessageInterceptingHandler
             {
                 InnerHandler = handler,
             };
@@ -57,6 +48,10 @@ namespace ApiFoundation.Services
 
             configuration.Routes.MapHttpRoute(name, routeTemplate, defaults, constraints, interceptor);
         }
+
+        public event EventHandler<HttpRequestEventArgs> RequestReceived;
+
+        public event EventHandler<HttpResponseEventArgs> SendingResponse;
 
         protected virtual void OnRequestReceived(HttpRequestEventArgs e)
         {

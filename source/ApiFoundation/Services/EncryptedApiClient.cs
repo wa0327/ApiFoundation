@@ -149,15 +149,23 @@ namespace ApiFoundation.Services
 
             var encryptedMessage = origin.ReadAsAsync<JObject>().Result;
 
-            var timestamp = (string)encryptedMessage["Timestamp"];
-            var cipher = Convert.FromBase64String((string)encryptedMessage["CipherText"]);
-            var signature = (string)encryptedMessage["Signature"];
-            var expires = (DateTime)encryptedMessage["Expires"];
             byte[] plain;
-            this.cryptoService.Decrypt(cipher, timestamp, signature, out plain);
+            try
+            {
+                var timestamp = (string)encryptedMessage["Timestamp"];
+                var cipher = Convert.FromBase64String((string)encryptedMessage["CipherText"]);
+                var signature = (string)encryptedMessage["Signature"];
+                var expires = (DateTime)encryptedMessage["Expires"];
 
-            this.timestamp = timestamp;
-            this.timestampExpires = expires;
+                this.cryptoService.Decrypt(cipher, timestamp, signature, out plain);
+
+                this.timestamp = timestamp;
+                this.timestampExpires = expires;
+            }
+            catch
+            {
+                throw new BadMessageException();
+            }
 
             e.ResponseMessage.Content = new ByteArrayContent(plain);
             e.ResponseMessage.Content.Headers.ContentType = origin.Headers.ContentType;

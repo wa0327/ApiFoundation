@@ -12,7 +12,7 @@ namespace ApiFoundation.Security.Cryptography
     [TestClass]
     public class CryptoServiceTest
     {
-        private CryptoService target;
+        private DefaultCryptoService target;
 
         [TestInitialize]
         public void TestInitialize()
@@ -27,7 +27,7 @@ namespace ApiFoundation.Security.Cryptography
         }
 
         [TestMethod]
-        public void CryptoService_Encrypt()
+        public void CryptoServiceTest_Encrypt()
         {
             var timestamp = "201310041855";
             var plainText = "`1234567890-=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~!@#$%^&*()_+";
@@ -48,7 +48,7 @@ namespace ApiFoundation.Security.Cryptography
         }
 
         [TestMethod]
-        public void CryptoService_Decrypt()
+        public void CryptoServiceTest_Decrypt()
         {
             var timestamp = "201310041855";
             var cipherText = "xRANotL/km4vWpPwPw6P1H8T2UXptwMGyFShVH/BmXsnv6E+pOTtfeOPfsbfap5TD1DfMTdOn94t1j/sk9NU984ESJn1wi2QEDmgR/SI3B4=";

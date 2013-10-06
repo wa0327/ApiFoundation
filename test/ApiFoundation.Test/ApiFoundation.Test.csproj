@@ -82,19 +82,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Security\Cryptography\CryptoServiceTest.cs" />
-    <Compile Include="Services\ServiceClientTest.cs" />
+    <Compile Include="Services\ApiClientTest.cs" />
     <Compile Include="Services\ApiServerTest.cs" />
-    <Compile Include="Services\EncryptedServiceRouteTest.cs" />
+    <Compile Include="Services\EncryptedApiServerTest.cs" />
     <Compile Include="Utility\CryptoServiceWrapper.cs" />
-    <Compile Include="Utility\EncryptedServiceClientWrapper.cs" />
+    <Compile Include="Utility\EncryptedApiClientWrapper.cs" />
     <Compile Include="Utility\ApiClientWrapper.cs" />
-    <Compile Include="Utility\EncryptedServiceRouteWrapper.cs" />
+    <Compile Include="Utility\EncryptedApiServerWrapper.cs" />
     <Compile Include="Utility\ApiServerWrapper.cs" />
     <Compile Include="Web\Http\Controllers\ApiServerTestController.cs" />
     <Compile Include="Web\Http\Controllers\InvalidModelRequest.cs" />
     <Compile Include="Web\Http\Controllers\BusinessErrorException.cs" />
     <Compile Include="Web\Http\Controllers\SmokeTestRequest.cs" />
     <Compile Include="Web\Http\Controllers\SmokeTestResponse.cs" />
+    <Compile Include="Web\Http\Filters\ExceptionFilterTest.cs" />
+    <Compile Include="Web\Http\Filters\ModelStateFilterTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

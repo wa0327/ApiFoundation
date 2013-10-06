@@ -16,22 +16,18 @@ namespace ApiFoundation.Web.Http.Filters
         public override void OnException(HttpActionExecutedContext context)
         {
             var e = new ExceptionEventArgs(context.Exception);
-            if (this.Exception != null)
-            {
-                this.Exception(this, e);
-            }
 
-            if (e.IsBusinessError)
+            this.OnException(e);
+
+            if (e.Handled)
             {
-                var bizError = new HttpError(e.ErrorMessage);
-                bizError["ErrorCode"] = e.ErrorCode;
+                var bizError = new HttpError(e.Message);
+                bizError["ReturnCode"] = e.ReturnCode;
                 context.Response = context.Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, bizError);
             }
             else
             {
-                // expression of other errors
-                var error = new HttpError(context.Exception.Message);
-                error["ErrorType"] = context.Exception.GetType().FullName;
+                var error = new HttpError(context.Exception, true);
                 context.Response = context.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, error);
             }
         }

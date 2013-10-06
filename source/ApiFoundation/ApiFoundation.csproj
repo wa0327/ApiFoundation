@@ -25,6 +25,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>BasicCorrectnessRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -80,16 +82,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Net\Http\DefaultTimestampProvider.cs" />
+    <Compile Include="Security\Cryptography\DefaultTimestampService.cs" />
     <Compile Include="Net\Http\HttpMessageInvokerExtensions.cs" />
-    <Compile Include="Net\Http\ITimestampProvider.cs" />
-    <Compile Include="Net\Http\MessageInterceptor.cs" />
-    <Compile Include="Net\Http\TimestampService.cs" />
+    <Compile Include="Security\Cryptography\InvalidTimestampException.cs" />
+    <Compile Include="Security\Cryptography\ITimestampService.cs" />
+    <Compile Include="Net\Http\MessageInterceptingHandler.cs" />
+    <Compile Include="Net\Http\TimestampServiceHandler.cs" />
+    <Compile Include="Security\Cryptography\IHttpContentCryptoService.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Security\Cryptography\CryptoService.cs" />
+    <Compile Include="Security\Cryptography\DefaultCryptoService.cs" />
     <Compile Include="Security\Cryptography\ICryptoService.cs" />
     <Compile Include="Security\Cryptography\InvalidSignatureException.cs" />
-    <Compile Include="Services\EncryptedMessage.cs" />
+    <Compile Include="Services\BadMessageException.cs" />
     <Compile Include="Services\ApiServer.cs" />
     <Compile Include="Services\BadInvocationException.cs" />
     <Compile Include="Web\Http\Filters\ExceptionEventArgs.cs" />

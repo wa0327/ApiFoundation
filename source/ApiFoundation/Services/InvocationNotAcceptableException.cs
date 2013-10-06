@@ -23,7 +23,7 @@ namespace ApiFoundation.Services
 
         public string ErrorCode
         {
-            get { return (string)this.httpError["ErrorCode"]; }
+            get { return (string)this.httpError["ReturnCode"]; }
         }
     }
 }

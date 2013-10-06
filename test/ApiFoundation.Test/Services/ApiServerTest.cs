@@ -35,90 +35,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServer_InvalidModel()
-        {
-            this.server.Configuration.Filters.Add(new ModelStateFilter());
-
-            try
-            {
-                this.client.Post<InvalidModelRequest, object>(
-                    "/api/ApiServerTest/InvalidModelTest",
-                    () =>
-                    {
-                        return new InvalidModelRequest
-                        {
-                            UserId = null,
-                            BackyardId = null,
-                            CatSubIds = null,
-                        };
-                    },
-                    null
-                );
-
-                Assert.Fail("Did not throw expected exception BadInvocationException.");
-            }
-            catch (BadInvocationException ex)
-            {
-                Assert.IsNotNull(ex.ModelState);
-                Assert.AreEqual("The UserId field is required.", ex.ModelState["request.UserId"][0]);
-                Assert.AreEqual("The BackyardId field is required.", ex.ModelState["request.BackyardId"][0]);
-                Assert.AreEqual("The CatSubIds field is required.", ex.ModelState["request.CatSubIds"][0]);
-            }
-        }
-
-        [TestMethod]
-        public void ApiServer_BusinessError_ExceptionFilter()
-        {
-            var exceptionFilter = new ExceptionFilter();
-            exceptionFilter.Exception += (sender, e) =>
-            {
-                e.IsBusinessError = true;
-                e.ErrorCode = "7533967";
-                e.ErrorMessage = "中毒太深";
-            };
-            this.server.Configuration.Filters.Add(exceptionFilter);
-
-            try
-            {
-                this.client.Post<object, object>(
-                    "/api/ApiServerTest/BusinessErrorTest",
-                    null,
-                    null
-                );
-
-                Assert.Fail("Did not throw expected exception InvocationNotAcceptableException.");
-            }
-            catch (InvocationNotAcceptableException ex)
-            {
-                Assert.AreEqual("中毒太深", ex.Message);
-                Assert.AreEqual("7533967", ex.ErrorCode);
-            }
-        }
-
-        [TestMethod]
-        public void ApiServer_ProgramError()
-        {
-            this.server.Configuration.Filters.Add(new ExceptionFilter());
-
-            try
-            {
-                this.client.Post<object, object>(
-                    "/api/ApiServerTest/ProgramErrorTest",
-                    null,
-                    null
-                );
-
-                Assert.Fail("Did not throw expected exception HttpServiceException.");
-            }
-            catch (HttpServiceException ex)
-            {
-                Assert.AreEqual("模擬非商業邏輯錯誤。", ex.Message);
-                Assert.AreEqual(typeof(InvalidOperationException).FullName, ex.ErrorType);
-            }
-        }
-
-        [TestMethod]
-        public void ApiServer_NoAction()
+        public void ApiServerTest_NoAction()
         {
             try
             {
@@ -132,12 +49,12 @@ namespace ApiFoundation.Services
             catch (HttpServiceException ex)
             {
                 Assert.IsTrue(ex.Message.StartsWith("No HTTP resource was found"));
-                Assert.IsTrue(ex.MessageDetail.StartsWith("No action was found"));
+                Assert.IsTrue(ex.ExceptionMessage.StartsWith("No action was found"));
             }
         }
 
         [TestMethod]
-        public void ApiServer_NoController()
+        public void ApiServerTest_NoController()
         {
             try
             {
@@ -151,12 +68,12 @@ namespace ApiFoundation.Services
             catch (HttpServiceException ex)
             {
                 Assert.IsTrue(ex.Message.StartsWith("No HTTP resource was found"));
-                Assert.IsTrue(ex.MessageDetail.StartsWith("No type was found"));
+                Assert.IsTrue(ex.ExceptionMessage.StartsWith("No type was found"));
             }
         }
 
         [TestMethod]
-        public void ApiServer_RequestAndResponse()
+        public void ApiServerTest_RequestAndResponse()
         {
             this.client.Post<SmokeTestRequest, SmokeTestResponse>(
                 "/api/ApiServerTest/RequestAndResponse",
@@ -182,7 +99,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServer_RequestOnly()
+        public void ApiServerTest_RequestOnly()
         {
             this.client.Post<SmokeTestRequest, object>(
                 "/api/ApiServerTest/RequestOnly",
@@ -200,7 +117,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServer_NullRequest()
+        public void ApiServerTest_NullRequest()
         {
             this.client.Post<SmokeTestRequest, object>(
                 "/api/ApiServerTest/NullRequest",
@@ -209,7 +126,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServer_ResponseOnly()
+        public void ApiServerTest_ResponseOnly()
         {
             this.client.Post<object, SmokeTestResponse>(
                 "/api/ApiServerTest/ResponseOnly",
@@ -226,7 +143,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServer_NullResponse()
+        public void ApiServerTest_NullResponse()
         {
             this.client.Post<object, SmokeTestResponse>(
                 "/api/ApiServerTest/NullResponse",
@@ -235,9 +152,9 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServer_Action()
+        public void ApiServerTest_ActionOnly()
         {
-            this.client.Post<object, object>("/api/ApiServerTest/Action", null, null);
+            this.client.Post<object, object>("/api/ApiServerTest/ActionOnly", null, null);
         }
     }
 }

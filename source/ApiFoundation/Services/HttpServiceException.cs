@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Text;
 using System.Web.Http;
 
 namespace ApiFoundation.Services
@@ -28,28 +24,42 @@ namespace ApiFoundation.Services
             get { return this.statusCode; }
         }
 
-        public string ErrorType
+        public string ExceptionMessage
         {
             get
             {
-                object errorType;
-                if (this.httpError.TryGetValue("ErrorType", out errorType))
+                object exceptionMessage;
+                if (this.httpError.TryGetValue("ExceptionMessage", out exceptionMessage))
                 {
-                    return (string)errorType;
+                    return (string)exceptionMessage;
                 }
 
                 return null;
             }
         }
 
-        public string MessageDetail
+        public string ExceptionType
         {
             get
             {
-                object detail;
-                if (this.httpError.TryGetValue("MessageDetail", out detail))
+                object exceptionType;
+                if (this.httpError.TryGetValue("ExceptionType", out exceptionType))
                 {
-                    return (string)detail;
+                    return (string)exceptionType;
+                }
+
+                return null;
+            }
+        }
+
+        public string ExceptionStackTrace
+        {
+            get
+            {
+                object stackTrace;
+                if (this.httpError.TryGetValue("StackTrace", out stackTrace))
+                {
+                    return (string)stackTrace;
                 }
 
                 return null;

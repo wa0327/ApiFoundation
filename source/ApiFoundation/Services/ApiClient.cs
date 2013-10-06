@@ -137,7 +137,7 @@ namespace ApiFoundation.Services
 
         private DelegatingHandler CreateMessageInterceptor()
         {
-            var interceptor = new MessageInterceptor();
+            var interceptor = new MessageInterceptingHandler();
             interceptor.ProcessingRequest += (sender, e) => this.OnSendingRequest(e);
             interceptor.ProcessingResponse += (sender, e) => this.OnResponseReceived(e);
 

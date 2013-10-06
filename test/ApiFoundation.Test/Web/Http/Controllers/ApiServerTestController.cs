@@ -73,7 +73,7 @@ namespace ApiFoundation.Web.Http.Controllers
         }
 
         [HttpPost]
-        public void Action()
+        public void ActionOnly()
         {
         }
     }

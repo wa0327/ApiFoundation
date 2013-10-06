@@ -15,9 +15,9 @@ namespace ApiFoundation.Services
     public class EncryptedApiServer : ApiServer
     {
         private readonly ICryptoService cryptoService;
-        private readonly ITimestampProvider timestampProvider;
+        private readonly ITimestampService timestampProvider;
 
-        public EncryptedApiServer(HttpConfiguration configuration, string name, string routeTemplate, object defaults, object constraints, HttpMessageHandler handler, ICryptoService cryptoService, ITimestampProvider timestampProvider)
+        public EncryptedApiServer(HttpConfiguration configuration, string name, string routeTemplate, object defaults, object constraints, HttpMessageHandler handler, ICryptoService cryptoService, ITimestampService timestampProvider)
             : base(configuration, name, routeTemplate, defaults, constraints, handler)
         {
             if (cryptoService == null)
@@ -33,12 +33,12 @@ namespace ApiFoundation.Services
             IHttpRoute route;
             if (configuration.Routes.TryGetValue("TimestampService", out route))
             {
-                var timestampService = (TimestampService)route.Handler;
+                var timestampService = (TimestampServiceHandler)route.Handler;
                 timestampService.TimestampProvider = timestampProvider;
             }
             else
             {
-                var timestampService = new TimestampService
+                var timestampService = new TimestampServiceHandler
                 {
                     TimestampProvider = timestampProvider,
                 };
@@ -124,11 +124,20 @@ namespace ApiFoundation.Services
 
             var encryptedMessage = origin.ReadAsAsync<JObject>().Result;
 
-            var timestamp = (string)encryptedMessage["Timestamp"];
-            var cipher = Convert.FromBase64String((string)encryptedMessage["CipherText"]);
-            var signature = (string)encryptedMessage["Signature"];
             byte[] plain;
-            this.cryptoService.Decrypt(cipher, timestamp, signature, out plain);
+            try
+            {
+                var timestamp = (string)encryptedMessage["Timestamp"];
+                var cipher = Convert.FromBase64String((string)encryptedMessage["CipherText"]);
+                var signature = (string)encryptedMessage["Signature"];
+
+                this.timestampProvider.Validate(timestamp);
+                this.cryptoService.Decrypt(cipher, timestamp, signature, out plain);
+            }
+            catch
+            {
+                throw new BadMessageException();
+            }
 
             e.RequestMessage.Content = new ByteArrayContent(plain);
             e.RequestMessage.Content.Headers.ContentType = origin.Headers.ContentType;

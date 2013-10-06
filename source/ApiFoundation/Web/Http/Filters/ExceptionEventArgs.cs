@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace ApiFoundation.Web.Http.Filters
 {
@@ -15,28 +12,33 @@ namespace ApiFoundation.Web.Http.Filters
         public Exception Exception { get; private set; }
 
         /// <summary>
-        /// 取得或設定此例外是否為商業邏輯錯誤。
+        /// 取得或設定此例外是否已處理。
         /// </summary>
         /// <value>
-        /// true: 是商業邏輯錯誤，應回傳 errorCode 及 errorMessae；
-        /// false: 非商業邏輯錯誤。
+        /// true: 已處理；
+        /// false: 未處理。
         /// </value>
-        public bool IsBusinessError { internal get; set; }
+        /// <remarks>
+        /// ExceptionFilter 會依據此值來回傳不同的內容給 client；
+        /// 已處理: 回傳 errorMessae 及 errorCode；
+        /// 未處理: 回傳詳細的 exception 內容。
+        /// </remarks>
+        public bool Handled { internal get; set; }
 
         /// <summary>
-        /// Sets the error code.
+        /// Gets or sets the return code.
         /// </summary>
         /// <value>
-        /// The error code.
+        /// The return code.
         /// </value>
-        public string ErrorCode { internal get; set; }
+        public string ReturnCode { internal get; set; }
 
         /// <summary>
-        /// Sets the error message.
+        /// Gets or sets the message.
         /// </summary>
         /// <value>
-        /// The error message.
+        /// The message.
         /// </value>
-        public string ErrorMessage { internal get; set; }
+        public string Message { internal get; set; }
     }
 }
