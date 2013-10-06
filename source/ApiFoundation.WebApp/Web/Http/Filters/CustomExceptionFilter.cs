@@ -6,8 +6,6 @@ namespace ApiFoundation.Web.Http.Filters
     {
         protected override void OnException(ExceptionEventArgs e)
         {
-            base.OnException(e);
-
             if (e.Exception is ExceptionTestException)
             {
                 e.Handled = true;
@@ -20,6 +18,8 @@ namespace ApiFoundation.Web.Http.Filters
                 e.ReturnCode = "7533967";
                 e.Message = "中毒太深";
             }
+
+            base.OnException(e);
         }
     }
 }

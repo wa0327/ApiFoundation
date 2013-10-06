@@ -108,7 +108,7 @@ namespace ApiFoundation.Services
                     throw new BadInvocationException(httpError);
                 }
 
-                // business errors
+                // handled error
                 if (responseMessage.StatusCode == HttpStatusCode.NotAcceptable)
                 {
                     throw new InvocationNotAcceptableException(httpError);

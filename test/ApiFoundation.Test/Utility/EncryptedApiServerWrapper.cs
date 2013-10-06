@@ -15,10 +15,6 @@ namespace ApiFoundation.Utility
     {
         private readonly HttpSelfHostServer server;
 
-        internal HttpSelfHostConfiguration Configuration { get; private set; }
-
-        internal EncryptedApiServer Route { get; private set; }
-
         internal EncryptedApiServerWrapper(string baseAddress)
         {
             this.Configuration = new HttpSelfHostConfiguration(baseAddress);
@@ -26,8 +22,8 @@ namespace ApiFoundation.Utility
             DefaultCryptoService cryptoService = new CryptoServiceWrapper();
             ITimestampService timestampProvider = new DefaultTimestampService(TimeSpan.FromMinutes(15));
 
-            this.Route = new EncryptedApiServer(this.Configuration, "API Default", "api/{controller}/{action}", null, null, null, cryptoService, timestampProvider);
-            this.Route.DecryptingRequest += (sender, e) =>
+            this.Inner = new EncryptedApiServer(this.Configuration, "API Default", "api/{controller}/{action}", null, null, null, cryptoService, timestampProvider);
+            this.Inner.DecryptingRequest += (sender, e) =>
             {
                 Trace.TraceInformation("DecryptingRequest");
 
@@ -40,7 +36,7 @@ namespace ApiFoundation.Utility
                     Trace.TraceInformation("RAW: {0}", raw);
                 }
             };
-            this.Route.RequestDecrypted += (sender, e) =>
+            this.Inner.RequestDecrypted += (sender, e) =>
             {
                 Trace.TraceInformation("RequestDecrypted");
 
@@ -53,7 +49,7 @@ namespace ApiFoundation.Utility
                     Trace.TraceInformation("RAW: {0}", raw);
                 }
             };
-            this.Route.EncryptingResponse += (sender, e) =>
+            this.Inner.EncryptingResponse += (sender, e) =>
             {
                 Trace.TraceInformation("EncryptingResponse");
 
@@ -66,7 +62,7 @@ namespace ApiFoundation.Utility
                     Trace.TraceInformation("RAW: {0}", raw);
                 }
             };
-            this.Route.ResponseEncrypted += (sender, e) =>
+            this.Inner.ResponseEncrypted += (sender, e) =>
             {
                 Trace.TraceInformation("ResponseEncrypted");
 
@@ -88,6 +84,10 @@ namespace ApiFoundation.Utility
             : this("http://localhost:8591")
         {
         }
+
+        internal HttpSelfHostConfiguration Configuration { get; private set; }
+
+        internal EncryptedApiServer Inner { get; private set; }
 
         public void Dispose()
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Http;
@@ -52,7 +53,37 @@ namespace ApiFoundation.WebApp
 
         private ApiServer CreatePlainRoute(HttpConfiguration configuration)
         {
-            return new ApiServer(configuration, "Plain Route", "api1/{controller}/{action}", null, null, null);
+            var route = new ApiServer(configuration, "Plain Route", "api1/{controller}/{action}", null, null, null);
+
+            route.RequestReceived += (sender, e) =>
+            {
+                Trace.TraceInformation("RECV from {0}", e.RequestMessage.Headers.From);
+
+                if (e.RequestMessage.Content != null)
+                {
+                    var header = e.RequestMessage.Content.Headers;
+                    Trace.TraceInformation("HEADER: {0}", header);
+
+                    var raw = e.RequestMessage.Content.ReadAsStringAsync().Result;
+                    Trace.TraceInformation("RAW: {0}", raw);
+                }
+            };
+
+            route.SendingResponse += (sender, e) =>
+            {
+                Trace.TraceInformation("SEND to {0}", e.ResponseMessage.RequestMessage.Headers.From);
+
+                if (e.ResponseMessage.Content != null)
+                {
+                    var header = e.ResponseMessage.Content.Headers;
+                    Trace.TraceInformation("HEADER: {0}", header);
+
+                    var raw = e.ResponseMessage.Content.ReadAsStringAsync().Result;
+                    Trace.TraceInformation("RAW: {0}", raw);
+                }
+            };
+
+            return route;
         }
 
         private ApiServer CreateEncryptedRoute(HttpConfiguration configuration)
@@ -90,7 +121,7 @@ namespace ApiFoundation.WebApp
                 Key = Encoding.UTF8.GetBytes("1234567890"),
             };
 
-            return new EncryptedApiServer(
+            var route = new EncryptedApiServer(
                 configuration,
                 "Encrypted Route",
                 "api2/{controller}/{action}",
@@ -99,6 +130,64 @@ namespace ApiFoundation.WebApp
                 null,
                 new DefaultCryptoService(symmetricAlgorithm, hashAlgorithm),
                 new DefaultTimestampService(TimeSpan.FromMinutes(15)));
+
+            route.DecryptingRequest += (sender, e) =>
+            {
+                Trace.TraceInformation("DecryptingRequest");
+
+                if (e.RequestMessage.Content != null)
+                {
+                    var header = e.RequestMessage.Content.Headers;
+                    Trace.TraceInformation("HEADER: {0}", header);
+
+                    var raw = e.RequestMessage.Content.ReadAsStringAsync().Result;
+                    Trace.TraceInformation("RAW: {0}", raw);
+                }
+            };
+
+            route.RequestDecrypted += (sender, e) =>
+            {
+                Trace.TraceInformation("RequestDecrypted");
+
+                if (e.RequestMessage.Content != null)
+                {
+                    var header = e.RequestMessage.Content.Headers;
+                    Trace.TraceInformation("HEADER: {0}", header);
+
+                    var raw = e.RequestMessage.Content.ReadAsStringAsync().Result;
+                    Trace.TraceInformation("RAW: {0}", raw);
+                }
+            };
+
+            route.EncryptingResponse += (sender, e) =>
+            {
+                Trace.TraceInformation("EncryptingResponse");
+
+                if (e.ResponseMessage.Content != null)
+                {
+                    var header = e.ResponseMessage.Content.Headers;
+                    Trace.TraceInformation("HEADER: {0}", header);
+
+                    var raw = e.ResponseMessage.Content.ReadAsStringAsync().Result;
+                    Trace.TraceInformation("RAW: {0}", raw);
+                }
+            };
+
+            route.ResponseEncrypted += (sender, e) =>
+            {
+                Trace.TraceInformation("ResponseEncrypted");
+
+                if (e.ResponseMessage.Content != null)
+                {
+                    var header = e.ResponseMessage.Content.Headers;
+                    Trace.TraceInformation("HEADER: {0}", header);
+
+                    var raw = e.ResponseMessage.Content.ReadAsStringAsync().Result;
+                    Trace.TraceInformation("RAW: {0}", raw);
+                }
+            };
+
+            return route;
         }
     }
 }

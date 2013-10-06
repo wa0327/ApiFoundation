@@ -9,7 +9,7 @@ namespace ApiFoundation.Utility
 {
     internal sealed class EncryptedApiClientWrapper : IDisposable
     {
-        private readonly EncryptedApiClient client;
+        private readonly EncryptedApiClient inner;
 
         internal EncryptedApiClientWrapper(string baseAddress)
         {
@@ -20,8 +20,8 @@ namespace ApiFoundation.Utility
                 BaseAddress = new Uri(baseAddress),
             };
 
-            this.client = new EncryptedApiClient(httpClient, cryptoService);
-            this.client.EncryptingRequest += (sender, e) =>
+            this.inner = new EncryptedApiClient(httpClient, cryptoService);
+            this.inner.EncryptingRequest += (sender, e) =>
             {
                 Trace.TraceInformation("EncryptingRequest");
 
@@ -34,7 +34,7 @@ namespace ApiFoundation.Utility
                     Trace.TraceInformation("RAW: {0}", raw);
                 }
             };
-            this.client.RequestEncrypted += (sender, e) =>
+            this.inner.RequestEncrypted += (sender, e) =>
             {
                 Trace.TraceInformation("RequestEncrypted");
 
@@ -47,7 +47,7 @@ namespace ApiFoundation.Utility
                     Trace.TraceInformation("RAW: {0}", raw);
                 }
             };
-            this.client.DecryptingResponse += (sender, e) =>
+            this.inner.DecryptingResponse += (sender, e) =>
             {
                 Trace.TraceInformation("DecryptingResponse");
 
@@ -60,7 +60,7 @@ namespace ApiFoundation.Utility
                     Trace.TraceInformation("RAW: {0}", raw);
                 }
             };
-            this.client.ResponseDecrypted += (sender, e) =>
+            this.inner.ResponseDecrypted += (sender, e) =>
             {
                 Trace.TraceInformation("ResponseDecrypted");
 
@@ -82,12 +82,12 @@ namespace ApiFoundation.Utility
 
         public void Dispose()
         {
-            this.client.Dispose();
+            this.inner.Dispose();
         }
 
         public static implicit operator EncryptedApiClient(EncryptedApiClientWrapper source)
         {
-            return source.client;
+            return source.inner;
         }
     }
 }

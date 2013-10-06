@@ -5,7 +5,7 @@ using System.Web.Http;
 namespace ApiFoundation.Services
 {
     /// <summary>
-    /// 當被呼叫端發生非商業邏輯錯誤時擲出。
+    /// 當被呼叫端發生錯誤時擲出。
     /// </summary>
     public sealed class HttpServiceException : Exception
     {
@@ -17,6 +17,20 @@ namespace ApiFoundation.Services
         {
             this.statusCode = statusCode;
             this.httpError = httpError;
+        }
+
+        public string MessageDetail
+        {
+            get
+            {
+                object messageDetail;
+                if (this.httpError.TryGetValue("MessageDetail", out messageDetail))
+                {
+                    return (string)messageDetail;
+                }
+
+                return null;
+            }
         }
 
         public HttpStatusCode StatusCode

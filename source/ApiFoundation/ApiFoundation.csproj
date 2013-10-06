@@ -82,6 +82,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Security\Cryptography\ClientContentCryptoService.cs" />
+    <Compile Include="Security\Cryptography\ServerContentCryptoService.cs" />
     <Compile Include="Security\Cryptography\DefaultTimestampService.cs" />
     <Compile Include="Net\Http\HttpMessageInvokerExtensions.cs" />
     <Compile Include="Security\Cryptography\InvalidTimestampException.cs" />
@@ -94,7 +96,7 @@
     <Compile Include="Security\Cryptography\DefaultCryptoService.cs" />
     <Compile Include="Security\Cryptography\ICryptoService.cs" />
     <Compile Include="Security\Cryptography\InvalidSignatureException.cs" />
-    <Compile Include="Services\BadMessageException.cs" />
+    <Compile Include="Security\Cryptography\BadMessageException.cs" />
     <Compile Include="Services\ApiServer.cs" />
     <Compile Include="Services\BadInvocationException.cs" />
     <Compile Include="Web\Http\Filters\ExceptionEventArgs.cs" />

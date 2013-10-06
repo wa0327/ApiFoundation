@@ -4,7 +4,8 @@ using System.Web.Http;
 namespace ApiFoundation.Services
 {
     /// <summary>
-    /// 當被呼叫端發生商業邏輯錯誤時擲出。
+    /// 當呼叫端的要求無法讓被呼叫端接受處理誤時擲出。
+    /// 例如：商業邏輯錯誤。
     /// </summary>
     public sealed class InvocationNotAcceptableException : Exception
     {

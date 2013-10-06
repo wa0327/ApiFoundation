@@ -8,7 +8,7 @@ namespace ApiFoundation.Utility
 {
     internal sealed class ApiClientWrapper : IDisposable
     {
-        private readonly ApiClient client;
+        private readonly ApiClient inner;
 
         internal ApiClientWrapper(string baseAddress)
         {
@@ -17,8 +17,8 @@ namespace ApiFoundation.Utility
                 BaseAddress = new Uri(baseAddress),
             };
 
-            this.client = new ApiClient(httpClient);
-            this.client.SendingRequest += (sender, e) =>
+            this.inner = new ApiClient(httpClient);
+            this.inner.SendingRequest += (sender, e) =>
             {
                 Trace.TraceInformation("SEND to {0}", e.RequestMessage.RequestUri);
 
@@ -31,7 +31,7 @@ namespace ApiFoundation.Utility
                     Trace.TraceInformation("RAW: {0}", raw);
                 }
             };
-            this.client.ResponseReceived += (sender, e) =>
+            this.inner.ResponseReceived += (sender, e) =>
             {
                 Trace.TraceInformation("RECV from {0}", e.ResponseMessage.RequestMessage.RequestUri);
 
@@ -53,12 +53,12 @@ namespace ApiFoundation.Utility
 
         public void Dispose()
         {
-            this.client.Dispose();
+            this.inner.Dispose();
         }
 
         public static implicit operator ApiClient(ApiClientWrapper source)
         {
-            return source.client;
+            return source.inner;
         }
     }
 }

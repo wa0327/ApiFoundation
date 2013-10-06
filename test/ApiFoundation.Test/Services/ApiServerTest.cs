@@ -35,44 +35,6 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServerTest_NoAction()
-        {
-            try
-            {
-                this.client.Post<object, object>(
-                    "/api/ApiServerTest/NoAction",
-                    null,
-                    null);
-
-                Assert.Fail("Did not throw expected exception HttpServiceException.");
-            }
-            catch (HttpServiceException ex)
-            {
-                Assert.IsTrue(ex.Message.StartsWith("No HTTP resource was found"));
-                Assert.IsTrue(ex.ExceptionMessage.StartsWith("No action was found"));
-            }
-        }
-
-        [TestMethod]
-        public void ApiServerTest_NoController()
-        {
-            try
-            {
-                this.client.Post<object, object>(
-                    "/api/NoController/NoAction",
-                    null,
-                    null);
-
-                Assert.Fail("Did not throw expected exception HttpServiceException.");
-            }
-            catch (HttpServiceException ex)
-            {
-                Assert.IsTrue(ex.Message.StartsWith("No HTTP resource was found"));
-                Assert.IsTrue(ex.ExceptionMessage.StartsWith("No type was found"));
-            }
-        }
-
-        [TestMethod]
         public void ApiServerTest_RequestAndResponse()
         {
             this.client.Post<SmokeTestRequest, SmokeTestResponse>(

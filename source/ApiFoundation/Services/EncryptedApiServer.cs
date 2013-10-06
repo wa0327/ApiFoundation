@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Net.Http.Headers;
 using System.Web.Http;
-using System.Web.Http.Routing;
 using ApiFoundation.Net.Http;
 using ApiFoundation.Security.Cryptography;
-using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Services
 {
     public class EncryptedApiServer : ApiServer
     {
-        private readonly ICryptoService cryptoService;
-        private readonly ITimestampService timestampProvider;
+        private readonly IHttpContentCryptoService contentCryptoService;
 
-        public EncryptedApiServer(HttpConfiguration configuration, string name, string routeTemplate, object defaults, object constraints, HttpMessageHandler handler, ICryptoService cryptoService, ITimestampService timestampProvider)
+        public EncryptedApiServer(HttpConfiguration configuration, string name, string routeTemplate, object defaults, object constraints, HttpMessageHandler handler, ICryptoService cryptoService, ITimestampService timestampService)
             : base(configuration, name, routeTemplate, defaults, constraints, handler)
         {
             if (cryptoService == null)
@@ -25,29 +18,14 @@ namespace ApiFoundation.Services
                 throw new ArgumentNullException("cryptoService");
             }
 
-            if (timestampProvider == null)
+            if (timestampService == null)
             {
-                throw new ArgumentNullException("timestampProvider");
+                throw new ArgumentNullException("timestampService");
             }
 
-            IHttpRoute route;
-            if (configuration.Routes.TryGetValue("TimestampService", out route))
-            {
-                var timestampService = (TimestampServiceHandler)route.Handler;
-                timestampService.TimestampProvider = timestampProvider;
-            }
-            else
-            {
-                var timestampService = new TimestampServiceHandler
-                {
-                    TimestampProvider = timestampProvider,
-                };
+            TimestampServiceHandler.Register(configuration, timestampService);
 
-                configuration.Routes.MapHttpRoute("TimestampService", "!timestamp!/{action}", null, null, timestampService);
-            }
-
-            this.cryptoService = cryptoService;
-            this.timestampProvider = timestampProvider;
+            this.contentCryptoService = new ServerContentCryptoService(cryptoService, timestampService);
         }
 
         public event EventHandler<HttpRequestEventArgs> DecryptingRequest;
@@ -110,67 +88,12 @@ namespace ApiFoundation.Services
 
         protected virtual void OnDecrypt(HttpRequestEventArgs e)
         {
-            var origin = e.RequestMessage.Content;
-
-            if (origin == null)
-            {
-                return;
-            }
-
-            if (origin.Headers.ContentLength == 0 || origin.ReadAsByteArrayAsync().Result.Length == 0)
-            {
-                return;
-            }
-
-            var encryptedMessage = origin.ReadAsAsync<JObject>().Result;
-
-            byte[] plain;
-            try
-            {
-                var timestamp = (string)encryptedMessage["Timestamp"];
-                var cipher = Convert.FromBase64String((string)encryptedMessage["CipherText"]);
-                var signature = (string)encryptedMessage["Signature"];
-
-                this.timestampProvider.Validate(timestamp);
-                this.cryptoService.Decrypt(cipher, timestamp, signature, out plain);
-            }
-            catch
-            {
-                throw new BadMessageException();
-            }
-
-            e.RequestMessage.Content = new ByteArrayContent(plain);
-            e.RequestMessage.Content.Headers.ContentType = origin.Headers.ContentType;
+            e.RequestMessage.Content = this.contentCryptoService.Decrypt(e.RequestMessage.Content);
         }
 
         protected virtual void OnEncrypt(HttpResponseEventArgs e)
         {
-            var origin = e.ResponseMessage.Content;
-
-            if (origin == null)
-            {
-                return;
-            }
-
-            string timestamp;
-            DateTime expires;
-            this.timestampProvider.GetTimestamp(out timestamp, out expires);
-
-            var plain = origin.ReadAsByteArrayAsync().Result;
-            byte[] cipher;
-            string signature;
-            this.cryptoService.Encrypt(plain, timestamp, out cipher, out signature);
-
-            var encryptedMessage = new
-            {
-                Timestamp = timestamp,
-                CipherText = Convert.ToBase64String(cipher),
-                Signature = signature,
-                Expires = expires,
-            };
-
-            e.ResponseMessage.Content = new ObjectContent(encryptedMessage.GetType(), encryptedMessage, new JsonMediaTypeFormatter());
-            e.ResponseMessage.Content.Headers.ContentType = origin.Headers.ContentType; // keep source content type
+            e.ResponseMessage.Content = this.contentCryptoService.Encrypt(e.ResponseMessage.Content);
         }
     }
 }

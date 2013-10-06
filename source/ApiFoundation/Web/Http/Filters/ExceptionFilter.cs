@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Filters;
+using ApiFoundation.Security.Cryptography;
 using ApiFoundation.Services;
 
 namespace ApiFoundation.Web.Http.Filters
@@ -21,9 +22,9 @@ namespace ApiFoundation.Web.Http.Filters
 
             if (e.Handled)
             {
-                var bizError = new HttpError(e.Message);
-                bizError["ReturnCode"] = e.ReturnCode;
-                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, bizError);
+                var error = new HttpError(e.Message);
+                error["ReturnCode"] = e.ReturnCode;
+                context.Response = context.Request.CreateErrorResponse(HttpStatusCode.NotAcceptable, error);
             }
             else
             {

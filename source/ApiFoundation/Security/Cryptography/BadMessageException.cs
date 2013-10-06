@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ApiFoundation.Services
+namespace ApiFoundation.Security.Cryptography
 {
     public sealed class BadMessageException : Exception
     {
-        public BadMessageException()
+        internal BadMessageException()
         {
         }
     }

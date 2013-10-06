@@ -10,16 +10,12 @@ namespace ApiFoundation.Utility
     {
         private readonly HttpSelfHostServer server;
 
-        internal HttpSelfHostConfiguration Configuration { get; private set; }
-
-        internal ApiServer Route { get; private set; }
-
         internal ApiServerWrapper(string baseAddress)
         {
             this.Configuration = new HttpSelfHostConfiguration(baseAddress);
 
-            this.Route = new ApiServer(this.Configuration, "API Default", "api/{controller}/{action}", null, null, null);
-            this.Route.RequestReceived += (sender, e) =>
+            this.Inner = new ApiServer(this.Configuration, "API Default", "api/{controller}/{action}", null, null, null);
+            this.Inner.RequestReceived += (sender, e) =>
             {
                 Trace.TraceInformation("RECV from {0}", e.RequestMessage.Headers.From);
 
@@ -32,7 +28,7 @@ namespace ApiFoundation.Utility
                     Trace.TraceInformation("RAW: {0}", raw);
                 }
             };
-            this.Route.SendingResponse += (sender, e) =>
+            this.Inner.SendingResponse += (sender, e) =>
             {
                 Trace.TraceInformation("SEND to {0}", e.ResponseMessage.RequestMessage.Headers.From);
 
@@ -49,6 +45,10 @@ namespace ApiFoundation.Utility
             this.server = new HttpSelfHostServer(this.Configuration);
             this.server.OpenAsync().Wait();
         }
+
+        internal HttpSelfHostConfiguration Configuration { get; private set; }
+
+        internal ApiServer Inner { get; private set; }
 
         internal ApiServerWrapper()
             : this("http://localhost:8591")
