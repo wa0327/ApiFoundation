@@ -2,7 +2,7 @@
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
 
-namespace ApiFoundation.Services
+namespace ApiFoundation.Net.Http
 {
     /// <summary>
     /// 當呼叫端送出的格式有問題時擲出。
@@ -15,7 +15,7 @@ namespace ApiFoundation.Services
         /// Initializes a new instance of the <see cref="BadInvocationException"/> class.
         /// </summary>
         /// <param name="httpError">The HTTP error.</param>
-        public BadInvocationException(HttpError httpError)
+        internal BadInvocationException(HttpError httpError)
             : base(httpError.Message)
         {
             this.httpError = httpError;

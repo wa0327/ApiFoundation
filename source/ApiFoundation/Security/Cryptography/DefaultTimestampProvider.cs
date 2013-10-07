@@ -2,13 +2,19 @@
 
 namespace ApiFoundation.Security.Cryptography
 {
-    public class DefaultTimestampService : ITimestampService
+    public class DefaultTimestampProvider : ITimestampProvider
     {
-        private readonly TimeSpan duration;
+        private TimeSpan duration;
 
-        public DefaultTimestampService(TimeSpan duration)
+        public DefaultTimestampProvider()
         {
-            this.duration = duration;
+            this.duration = TimeSpan.FromMinutes(15);
+        }
+
+        public TimeSpan Duration
+        {
+            get { return this.duration; }
+            set { this.duration = value; }
         }
 
         public virtual void GetTimestamp(out string timestamp, out DateTime expires)
@@ -27,9 +33,9 @@ namespace ApiFoundation.Security.Cryptography
             {
                 target = new DateTime(long.Parse(timestamp));
             }
-            catch
+            catch (Exception ex)
             {
-                throw new InvalidTimestampException();
+                throw new InvalidTimestampException(ex);
             }
 
             if (now.Ticks < target.Ticks || target >= expires)

@@ -2,8 +2,13 @@
 
 namespace ApiFoundation.Security.Cryptography
 {
-    public interface ITimestampService
+    public interface ITimestampProvider
     {
+        /// <summary>
+        /// 取得或設定時戳的有效時間長度。
+        /// </summary>
+        TimeSpan Duration { get; set; }
+
         void GetTimestamp(out string timestamp, out DateTime expires);
 
         /// <summary>

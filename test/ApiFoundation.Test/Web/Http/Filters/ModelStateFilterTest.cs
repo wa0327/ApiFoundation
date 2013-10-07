@@ -1,4 +1,5 @@
-﻿using ApiFoundation.Services;
+﻿using ApiFoundation.Net.Http;
+using ApiFoundation.Services;
 using ApiFoundation.Utility;
 using ApiFoundation.Web.Http.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,7 +27,7 @@ namespace ApiFoundation.Web.Http.Filters
         }
 
         [TestMethod]
-        public void ModelStateFilterTest_InvalidModel()
+        public void ModelStateFilter_InvalidModel()
         {
             this.server.Configuration.Filters.Add(new ModelStateFilter());
 

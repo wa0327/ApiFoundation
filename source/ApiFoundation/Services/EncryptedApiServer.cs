@@ -8,9 +8,11 @@ namespace ApiFoundation.Services
 {
     public class EncryptedApiServer : ApiServer
     {
-        private readonly IHttpContentCryptoService contentCryptoService;
+        private ICryptoService cryptoService;
+        private ITimestampProvider timestampProvider;
+        private IHttpMessageCryptoService contentCryptoService;
 
-        public EncryptedApiServer(HttpConfiguration configuration, string name, string routeTemplate, object defaults, object constraints, HttpMessageHandler handler, ICryptoService cryptoService, ITimestampService timestampService)
+        public EncryptedApiServer(HttpConfiguration configuration, string name, string routeTemplate, object defaults, object constraints, HttpMessageHandler handler, ICryptoService cryptoService, ITimestampProvider timestampProvider)
             : base(configuration, name, routeTemplate, defaults, constraints, handler)
         {
             if (cryptoService == null)
@@ -18,14 +20,37 @@ namespace ApiFoundation.Services
                 throw new ArgumentNullException("cryptoService");
             }
 
-            if (timestampService == null)
+            if (timestampProvider == null)
             {
-                throw new ArgumentNullException("timestampService");
+                throw new ArgumentNullException("timestampProvider");
             }
 
-            TimestampServiceHandler.Register(configuration, timestampService);
+            TimestampServiceHandler.Register(configuration, timestampProvider);
 
-            this.contentCryptoService = new ServerContentCryptoService(cryptoService, timestampService);
+            this.cryptoService = cryptoService;
+            this.timestampProvider = timestampProvider;
+            this.contentCryptoService = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider);
+        }
+
+        public EncryptedApiServer(HttpConfiguration configuration, string name, string routeTemplate, object defaults, object constraints, HttpMessageHandler handler, string secretKeyPassword, string initialVectorPassword, string hashKeyString)
+            : base(configuration, name, routeTemplate, defaults, constraints, handler)
+        {
+            this.cryptoService = new DefaultCryptoService(secretKeyPassword, initialVectorPassword, hashKeyString);
+            this.timestampProvider = new DefaultTimestampProvider();
+
+            TimestampServiceHandler.Register(configuration, this.timestampProvider);
+
+            this.contentCryptoService = new DefaultHttpMessageCryptoService(cryptoService, this.timestampProvider);
+        }
+
+        public ICryptoService CryptoService
+        {
+            get { return this.cryptoService; }
+        }
+
+        public ITimestampProvider TimestampProvider
+        {
+            get { return this.timestampProvider; }
         }
 
         public event EventHandler<HttpRequestEventArgs> DecryptingRequest;
@@ -40,21 +65,21 @@ namespace ApiFoundation.Services
         {
             base.OnRequestReceived(e);
 
-            this.OnRequestDecrypting(e);
+            this.OnDecryptingRequest(e);
             this.OnDecrypt(e);
             this.OnRequestDecrypted(e);
         }
 
         protected override void OnSendingResponse(HttpResponseEventArgs e)
         {
-            this.OnResponseEncrypting(e);
+            this.OnEncryptingResponse(e);
             this.OnEncrypt(e);
             this.OnResponseEncrypted(e);
 
             base.OnSendingResponse(e);
         }
 
-        protected virtual void OnRequestDecrypting(HttpRequestEventArgs e)
+        protected virtual void OnDecryptingRequest(HttpRequestEventArgs e)
         {
             if (this.DecryptingRequest != null)
             {
@@ -70,7 +95,7 @@ namespace ApiFoundation.Services
             }
         }
 
-        protected virtual void OnResponseEncrypting(HttpResponseEventArgs e)
+        protected virtual void OnEncryptingResponse(HttpResponseEventArgs e)
         {
             if (this.EncryptingResponse != null)
             {
@@ -88,12 +113,19 @@ namespace ApiFoundation.Services
 
         protected virtual void OnDecrypt(HttpRequestEventArgs e)
         {
-            e.RequestMessage.Content = this.contentCryptoService.Decrypt(e.RequestMessage.Content);
+            try
+            {
+                e.RequestMessage = this.contentCryptoService.Decrypt(e.RequestMessage);
+            }
+            catch (Exception ex)
+            {
+                throw new BadMessageException(ex);
+            }
         }
 
         protected virtual void OnEncrypt(HttpResponseEventArgs e)
         {
-            e.ResponseMessage.Content = this.contentCryptoService.Encrypt(e.ResponseMessage.Content);
+            e.ResponseMessage = this.contentCryptoService.Encrypt(e.ResponseMessage);
         }
     }
 }

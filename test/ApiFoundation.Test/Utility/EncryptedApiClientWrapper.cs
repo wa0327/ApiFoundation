@@ -13,8 +13,7 @@ namespace ApiFoundation.Utility
 
         internal EncryptedApiClientWrapper(string baseAddress)
         {
-            DefaultCryptoService cryptoService = new CryptoServiceWrapper();
-
+            var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString");
             var httpClient = new HttpClient
             {
                 BaseAddress = new Uri(baseAddress),

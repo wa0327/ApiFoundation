@@ -7,8 +7,5 @@ namespace ApiFoundation.Security.Cryptography
 {
     public sealed class InvalidSignatureException : Exception
     {
-        public InvalidSignatureException()
-        {
-        }
     }
 }

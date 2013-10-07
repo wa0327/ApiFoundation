@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Specialized;
+using System.Configuration;
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Text;
 using System.Web.Http;
 using System.Web.Mvc;
+using ApiFoundation.Configuration;
 using ApiFoundation.Net.Http;
 using ApiFoundation.Security.Cryptography;
 using ApiFoundation.Services;
@@ -19,7 +21,7 @@ namespace ApiFoundation.WebApp
 
             var config = GlobalConfiguration.Configuration;
 
-            this.CreatePlainRoute(config);
+            this.CreateRoute(config);
             this.CreateEncryptedRoute(config);
 
             config.Filters.Add(new ModelStateFilter());
@@ -51,9 +53,9 @@ namespace ApiFoundation.WebApp
             // 或 SQLServer，就不會引發這個事件。
         }
 
-        private ApiServer CreatePlainRoute(HttpConfiguration configuration)
+        private ApiServer CreateRoute(HttpConfiguration configuration)
         {
-            var route = new ApiServer(configuration, "Plain Route", "api1/{controller}/{action}", null, null, null);
+            var route = new ApiServer(configuration, "API Default", "api/{controller}/{action}", null, null, null);
 
             route.RequestReceived += (sender, e) =>
             {
@@ -88,39 +90,13 @@ namespace ApiFoundation.WebApp
 
         private ApiServer CreateEncryptedRoute(HttpConfiguration configuration)
         {
-            Func<byte[]> secretKeyCreator = () =>
+            var section = (NameValueCollection)ConfigurationManager.GetSection("Api2CryptoGraphySettings");
+            if (section == null)
             {
-                var password = "123456789012345678901234";
+                throw new ApplicationException("Config section 'RestfulWebService' has not been set.");
+            }
 
-                byte[] salt = new byte[32];
-                using (var deriveBytes = new Rfc2898DeriveBytes(password, salt, 32))
-                {
-                    return deriveBytes.GetBytes(32);
-                }
-            };
-
-            Func<byte[]> initialVectorCreator = () =>
-            {
-                var password = "12345678";
-
-                byte[] salt = new byte[16];
-                using (var deriveBytes = new Rfc2898DeriveBytes(password, salt, 16))
-                {
-                    return deriveBytes.GetBytes(16);
-                }
-            };
-
-            var symmetricAlgorithm = new AesCryptoServiceProvider
-            {
-                Key = secretKeyCreator(),
-                IV = initialVectorCreator(),
-            };
-
-            var hashAlgorithm = new HMACSHA512
-            {
-                Key = Encoding.UTF8.GetBytes("1234567890"),
-            };
-
+            var settings = new CryptoGraphySettings(section);
             var route = new EncryptedApiServer(
                 configuration,
                 "Encrypted Route",
@@ -128,8 +104,9 @@ namespace ApiFoundation.WebApp
                 null,
                 null,
                 null,
-                new DefaultCryptoService(symmetricAlgorithm, hashAlgorithm),
-                new DefaultTimestampService(TimeSpan.FromMinutes(15)));
+                settings.SecretKey,
+                settings.InitialVector,
+                settings.HashKey);
 
             route.DecryptingRequest += (sender, e) =>
             {

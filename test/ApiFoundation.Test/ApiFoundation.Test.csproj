@@ -77,15 +77,18 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Net\Http\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Security\Cryptography\CryptoServiceTest.cs" />
+    <Compile Include="Net\Http\ClientMessageDumper.cs" />
+    <Compile Include="Net\Http\EncryptedHttpClientHandlerTest.cs" />
+    <Compile Include="Net\Http\EncryptedHttpClientWrapper.cs" />
+    <Compile Include="Net\Http\ServerMessageDumper.cs" />
+    <Compile Include="Security\Cryptography\AESTest.cs" />
+    <Compile Include="Security\Cryptography\DefaultCryptoServiceTest.cs" />
     <Compile Include="Services\ApiClientTest.cs" />
     <Compile Include="Services\ApiServerTest.cs" />
     <Compile Include="Services\EncryptedApiServerTest.cs" />
-    <Compile Include="Utility\CryptoServiceWrapper.cs" />
     <Compile Include="Utility\EncryptedApiClientWrapper.cs" />
     <Compile Include="Utility\ApiClientWrapper.cs" />
     <Compile Include="Utility\EncryptedApiServerWrapper.cs" />

@@ -3,7 +3,7 @@ using System.Net.Http;
 
 namespace ApiFoundation.Services
 {
-    public static class ServiceClientExtensions
+    public static class ApiClientExtensions
     {
         public static void Send<TRequest, TResponse>(this ApiClient source, HttpMethod method, string requestUri, Func<TRequest> requestCreator, Action<TResponse> responseParser)
             where TRequest : class

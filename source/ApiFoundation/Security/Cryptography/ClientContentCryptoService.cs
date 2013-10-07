@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Threading;
 using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Security.Cryptography
 {
-    internal sealed class ClientContentCryptoService : IHttpContentCryptoService
+    internal sealed class ClientContentCryptoService : IHttpMessageCryptoService
     {
         private readonly HttpClient httpClient;
         private readonly string timestampUri;
         private readonly ICryptoService cryptoService;
+        private readonly ITimestampProvider timestampProvider;
 
         private string timestamp;
         private DateTime timestampExpires;
@@ -36,81 +38,104 @@ namespace ApiFoundation.Security.Cryptography
             this.cryptoService = cryptoService;
         }
 
-        public HttpContent Encrypt(HttpContent origin)
+        internal ClientContentCryptoService(ICryptoService cryptoService, ITimestampProvider timestampProvider)
         {
-            if (origin == null)
+            if (cryptoService == null)
             {
-                return origin;
+                throw new ArgumentNullException("cryptoService");
             }
 
-            var plain = origin.ReadAsByteArrayAsync().Result;
-            var timestamp = this.GetTimestamp();
+            if (timestampProvider == null)
+            {
+                throw new ArgumentNullException("timestampProvider");
+            }
 
+            this.cryptoService = cryptoService;
+            this.timestampProvider = timestampProvider;
+        }
+
+        public HttpContent Encrypt(HttpContent plainContent)
+        {
+            if (plainContent == null)
+            {
+                return plainContent;
+            }
+
+            var plain = plainContent.ReadAsByteArrayAsync().Result;
+            var timestamp = this.GetTimestamp();
             byte[] cipher;
             string signature;
             this.cryptoService.Encrypt(plain, timestamp, out cipher, out signature);
 
-            var encryptedMessage = new
+            var encrypted = new
             {
                 Timestamp = timestamp,
                 CipherText = Convert.ToBase64String(cipher),
                 Signature = signature,
             };
 
-            var encrypted = new ObjectContent(encryptedMessage.GetType(), encryptedMessage, new JsonMediaTypeFormatter());
-            encrypted.Headers.ContentType = origin.Headers.ContentType; // keep source content type
+            var encryptedContent = new ObjectContent(encrypted.GetType(), encrypted, new JsonMediaTypeFormatter());
+            encryptedContent.Headers.ContentType = plainContent.Headers.ContentType; // keep source content type
 
-            return encrypted;
+            return encryptedContent;
         }
 
-        public HttpContent Decrypt(HttpContent encrypted)
+        public HttpContent Decrypt(HttpContent cipherContent)
         {
-            if (encrypted == null)
+            if (cipherContent == null)
             {
-                return encrypted;
+                return cipherContent;
             }
 
-            if (encrypted.Headers.ContentLength == 0 || encrypted.ReadAsByteArrayAsync().Result.Length == 0)
+            if (cipherContent.Headers.ContentLength == 0 || cipherContent.ReadAsByteArrayAsync().Result.Length == 0)
             {
-                return encrypted;
+                return cipherContent;
             }
 
-            var encryptedMessage = encrypted.ReadAsAsync<JObject>().Result;
+            var message = cipherContent.ReadAsAsync<JObject>().Result;
 
             byte[] plain;
             try
             {
-                var timestamp = (string)encryptedMessage["Timestamp"];
-                var cipher = Convert.FromBase64String((string)encryptedMessage["CipherText"]);
-                var signature = (string)encryptedMessage["Signature"];
-                var expires = (DateTime)encryptedMessage["Expires"];
+                var timestamp = (string)message["Timestamp"];
+                var cipher = Convert.FromBase64String((string)message["CipherText"]);
+                var signature = (string)message["Signature"];
+                var expires = (DateTime)message["Expires"];
 
                 this.cryptoService.Decrypt(cipher, timestamp, signature, out plain);
 
                 this.timestamp = timestamp;
                 this.timestampExpires = expires;
             }
-            catch
+            catch (Exception ex)
             {
-                throw new BadMessageException();
+                throw new InvalidHttpContentException(ex);
             }
 
-            var origin = new ByteArrayContent(plain);
-            origin.Headers.ContentType = encrypted.Headers.ContentType;
+            var plainContent = new ByteArrayContent(plain);
+            plainContent.Headers.ContentType = cipherContent.Headers.ContentType;
 
-            return origin;
+            return plainContent;
         }
 
         private string GetTimestamp()
         {
             if (this.timestamp == null || DateTime.UtcNow >= this.timestampExpires)
             {
-                var requestMessage = new HttpRequestMessage(HttpMethod.Get, this.timestampUri);
-                var responseMessage = this.httpClient.SendAsync(requestMessage).Result;
-                var response = responseMessage.Content.ReadAsAsync<JObject>().Result;
+                if (this.httpClient != null)
+                {
+                    var requestMessage = new HttpRequestMessage(HttpMethod.Get, this.timestampUri);
+                    HttpResponseMessage responseMessage = null;
+                    responseMessage = this.httpClient.SendAsync(requestMessage).Result;
+                    var response = responseMessage.Content.ReadAsAsync<JObject>().Result;
 
-                this.timestamp = (string)response["Timestamp"];
-                this.timestampExpires = (DateTime)response["Expires"];
+                    this.timestamp = (string)response["Timestamp"];
+                    this.timestampExpires = (DateTime)response["Expires"];
+                }
+                else if (this.timestampProvider != null)
+                {
+                    this.timestampProvider.GetTimestamp(out this.timestamp, out this.timestampExpires);
+                }
             }
 
             return this.timestamp;

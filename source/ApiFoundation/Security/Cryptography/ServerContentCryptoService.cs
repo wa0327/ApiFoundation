@@ -8,79 +8,78 @@ using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Security.Cryptography
 {
-    internal sealed class ServerContentCryptoService : IHttpContentCryptoService
+    internal sealed class ServerContentCryptoService : IHttpMessageCryptoService
     {
         private readonly ICryptoService cryptoService;
-        private readonly ITimestampService timestampService;
+        private readonly ITimestampProvider timestampProvider;
 
-        internal ServerContentCryptoService(ICryptoService cryptoService, ITimestampService timestampService)
+        internal ServerContentCryptoService(ICryptoService cryptoService, ITimestampProvider timestampProvider)
         {
             if (cryptoService == null)
             {
                 throw new ArgumentNullException("cryptoService");
             }
 
-            if (timestampService == null)
+            if (timestampProvider == null)
             {
-                throw new ArgumentNullException("timestampService");
+                throw new ArgumentNullException("timestampProvider");
             }
 
             this.cryptoService = cryptoService;
-            this.timestampService = timestampService;
+            this.timestampProvider = timestampProvider;
         }
 
-        public HttpContent Decrypt(HttpContent encrypted)
+        public HttpContent Decrypt(HttpContent cipherContent)
         {
-            if (encrypted == null)
+            if (cipherContent == null)
             {
-                return encrypted;
+                return cipherContent;
             }
 
-            if (encrypted.Headers.ContentLength == 0 || encrypted.ReadAsByteArrayAsync().Result.Length == 0)
+            if (cipherContent.Headers.ContentLength == 0 || cipherContent.ReadAsByteArrayAsync().Result.Length == 0)
             {
-                return encrypted;
+                return cipherContent;
             }
 
-            var encryptedMessage = encrypted.ReadAsAsync<JObject>().Result;
+            var content = cipherContent.ReadAsAsync<JObject>().Result;
 
             byte[] plain;
             try
             {
-                var timestamp = (string)encryptedMessage["Timestamp"];
-                var cipher = Convert.FromBase64String((string)encryptedMessage["CipherText"]);
-                var signature = (string)encryptedMessage["Signature"];
+                var timestamp = (string)content["Timestamp"];
+                var cipher = Convert.FromBase64String((string)content["CipherText"]);
+                var signature = (string)content["Signature"];
 
-                this.timestampService.Validate(timestamp);
+                this.timestampProvider.Validate(timestamp);
                 this.cryptoService.Decrypt(cipher, timestamp, signature, out plain);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new BadMessageException();
+                throw new InvalidHttpContentException(ex);
             }
 
-            var origin = new ByteArrayContent(plain);
-            origin.Headers.ContentType = encrypted.Headers.ContentType;
+            var originContent = new ByteArrayContent(plain);
+            originContent.Headers.ContentType = cipherContent.Headers.ContentType;
 
-            return origin;
+            return originContent;
         }
 
-        public HttpContent Encrypt(HttpContent origin)
+        public HttpContent Encrypt(HttpContent plainContent)
         {
-            if (origin == null)
+            if (plainContent == null)
             {
-                return origin;
+                return plainContent;
             }
 
+            var plain = plainContent.ReadAsByteArrayAsync().Result;
             string timestamp;
             DateTime expires;
-            this.timestampService.GetTimestamp(out timestamp, out expires);
-
-            var plain = origin.ReadAsByteArrayAsync().Result;
+            this.timestampProvider.GetTimestamp(out timestamp, out expires);
             byte[] cipher;
             string signature;
             this.cryptoService.Encrypt(plain, timestamp, out cipher, out signature);
 
-            var encryptedMessage = new
+            var message = new
             {
                 Timestamp = timestamp,
                 CipherText = Convert.ToBase64String(cipher),
@@ -88,10 +87,10 @@ namespace ApiFoundation.Security.Cryptography
                 Expires = expires,
             };
 
-            var encrypted = new ObjectContent(encryptedMessage.GetType(), encryptedMessage, new JsonMediaTypeFormatter());
-            encrypted.Headers.ContentType = origin.Headers.ContentType;
+            var encryptedContent = new ObjectContent(message.GetType(), message, new JsonMediaTypeFormatter());
+            encryptedContent.Headers.ContentType = plainContent.Headers.ContentType;
 
-            return encrypted;
+            return encryptedContent;
         }
     }
 }

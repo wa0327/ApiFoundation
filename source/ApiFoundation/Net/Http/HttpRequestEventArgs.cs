@@ -5,9 +5,9 @@ namespace ApiFoundation.Net.Http
 {
     public sealed class HttpRequestEventArgs : EventArgs
     {
-        internal HttpRequestEventArgs(HttpRequestMessage requestMessage)
+        internal HttpRequestEventArgs(HttpRequestMessage request)
         {
-            this.RequestMessage = requestMessage;
+            this.RequestMessage = request;
         }
 
         public HttpRequestMessage RequestMessage { get; set; }

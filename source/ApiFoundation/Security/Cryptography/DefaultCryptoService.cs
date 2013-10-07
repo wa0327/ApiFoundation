@@ -8,10 +8,10 @@ namespace ApiFoundation.Security.Cryptography
 {
     public class DefaultCryptoService : ICryptoService
     {
-        private readonly SymmetricAlgorithm symmetricAlgorithm;
-        private readonly HashAlgorithm hashAlgorithm;
+        private readonly ISymmetricAlgorithm symmetricAlgorithm;
+        private readonly IHashAlgorithm hashAlgorithm;
 
-        public DefaultCryptoService(SymmetricAlgorithm symmetricAlgorithm, HashAlgorithm hashAlgorithm)
+        public DefaultCryptoService(ISymmetricAlgorithm symmetricAlgorithm, IHashAlgorithm hashAlgorithm)
         {
             if (symmetricAlgorithm == null)
             {
@@ -25,6 +25,27 @@ namespace ApiFoundation.Security.Cryptography
 
             this.symmetricAlgorithm = symmetricAlgorithm;
             this.hashAlgorithm = hashAlgorithm;
+        }
+
+        public DefaultCryptoService(string secretKeyPassword, string initialVectorPassword, string hashKeyString)
+        {
+            if (secretKeyPassword == null)
+            {
+                throw new ArgumentNullException("secretKeyPassword");
+            }
+
+            if (initialVectorPassword == null)
+            {
+                throw new ArgumentNullException("initialVectorPassword");
+            }
+
+            if (hashKeyString == null)
+            {
+                throw new ArgumentNullException("hashKey");
+            }
+
+            this.symmetricAlgorithm = new AES(secretKeyPassword, initialVectorPassword);
+            this.hashAlgorithm = new HMACSHA512(hashKeyString);
         }
 
         public void Dispose()
@@ -45,8 +66,7 @@ namespace ApiFoundation.Security.Cryptography
                 throw new ArgumentNullException("timestamp");
             }
 
-            var encryptor = this.symmetricAlgorithm.CreateEncryptor();
-            cipher = this.Transform(plain, encryptor);
+            cipher = this.symmetricAlgorithm.Encrypt(plain);
             signature = this.ComputeSignature(cipher, timestamp);
         }
 
@@ -73,32 +93,7 @@ namespace ApiFoundation.Security.Cryptography
                 throw new InvalidSignatureException();
             }
 
-            var decryptor = this.symmetricAlgorithm.CreateDecryptor();
-            plain = this.Transform(cipher, decryptor);
-        }
-
-        private byte[] Transform(byte[] input, ICryptoTransform transform)
-        {
-            if (input == null)
-            {
-                throw new ArgumentNullException("input");
-            }
-
-            if (transform == null)
-            {
-                throw new ArgumentNullException("transform");
-            }
-
-            using (var outputBuffer = new MemoryStream())
-            {
-                using (var cryptoStream = new CryptoStream(outputBuffer, transform, CryptoStreamMode.Write))
-                {
-                    cryptoStream.Write(input, 0, input.Length);
-                    cryptoStream.FlushFinalBlock();
-                }
-
-                return outputBuffer.ToArray();
-            }
+            plain = this.symmetricAlgorithm.Decrypt(cipher);
         }
 
         private string ComputeSignature(byte[] cipher, string timestamp)

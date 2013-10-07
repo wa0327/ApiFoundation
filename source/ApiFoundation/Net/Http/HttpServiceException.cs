@@ -2,7 +2,7 @@
 using System.Net;
 using System.Web.Http;
 
-namespace ApiFoundation.Services
+namespace ApiFoundation.Net.Http
 {
     /// <summary>
     /// 當被呼叫端發生錯誤時擲出。
@@ -12,7 +12,7 @@ namespace ApiFoundation.Services
         private readonly HttpStatusCode statusCode;
         private readonly HttpError httpError;
 
-        public HttpServiceException(HttpStatusCode statusCode, HttpError httpError)
+        internal HttpServiceException(HttpStatusCode statusCode, HttpError httpError)
             : base(httpError.Message)
         {
             this.statusCode = statusCode;

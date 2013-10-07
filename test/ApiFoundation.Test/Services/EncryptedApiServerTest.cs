@@ -27,7 +27,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void EncryptedApiServerTest_GetTimestamp()
+        public void EncryptedApiServer_GetTimestamp()
         {
             using (ApiClient client = new ApiClientWrapper())
             {
@@ -44,7 +44,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void EncryptedApiServerTest_ApiFoundation_GetTimestamp()
+        public void EncryptedApiServer_IIS_GetTimestamp()
         {
             using (ApiClient client = new ApiClientWrapper())
             {
@@ -61,7 +61,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void EncryptedApiServerTest_RequestAndResponse()
+        public void EncryptedApiServer_RequestAndResponse()
         {
             using (EncryptedApiClient client = new EncryptedApiClientWrapper())
             {
@@ -90,7 +90,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void EncryptedApiServerTest_RequestOnly()
+        public void EncryptedApiServer_RequestOnly()
         {
             using (EncryptedApiClient client = new EncryptedApiClientWrapper())
             {
@@ -114,7 +114,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void EncryptedApiServerTest_NullRequest()
+        public void EncryptedApiServer_NullRequest()
         {
             using (EncryptedApiClient client = new EncryptedApiClientWrapper())
             {
@@ -126,7 +126,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void EncryptedApiServerTest_ResponseOnly()
+        public void EncryptedApiServer_ResponseOnly()
         {
             using (EncryptedApiClient client = new EncryptedApiClientWrapper())
             {
@@ -146,7 +146,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void EncryptedApiServerTest_NullResponse()
+        public void EncryptedApiServer_NullResponse()
         {
             using (EncryptedApiClient client = new EncryptedApiClientWrapper())
             {
@@ -158,7 +158,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void EncryptedApiServerTest_ActionOnly()
+        public void EncryptedApiServer_ActionOnly()
         {
             using (EncryptedApiClient client = new EncryptedApiClientWrapper())
             {

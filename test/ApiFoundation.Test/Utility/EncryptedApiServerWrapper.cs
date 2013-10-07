@@ -19,8 +19,8 @@ namespace ApiFoundation.Utility
         {
             this.Configuration = new HttpSelfHostConfiguration(baseAddress);
 
-            DefaultCryptoService cryptoService = new CryptoServiceWrapper();
-            ITimestampService timestampProvider = new DefaultTimestampService(TimeSpan.FromMinutes(15));
+            var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString");
+            var timestampProvider = new DefaultTimestampProvider();
 
             this.Inner = new EncryptedApiServer(this.Configuration, "API Default", "api/{controller}/{action}", null, null, null, cryptoService, timestampProvider);
             this.Inner.DecryptingRequest += (sender, e) =>

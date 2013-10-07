@@ -7,9 +7,7 @@ namespace ApiFoundation.Services
 {
     public class EncryptedApiClient : ApiClient
     {
-        private const string TimestampService_Uri = "/!timestamp!/get";
-
-        private readonly IHttpContentCryptoService contentCryptoService;
+        private readonly IHttpMessageCryptoService contentCryptoService;
 
         public EncryptedApiClient(HttpClient messageInvoker, ICryptoService cryptoService)
             : base(messageInvoker)
@@ -19,7 +17,15 @@ namespace ApiFoundation.Services
                 throw new ArgumentNullException("cryptoService");
             }
 
-            this.contentCryptoService = new ClientContentCryptoService(messageInvoker, TimestampServiceHandler.GetUri, cryptoService);
+            //this.contentCryptoService = new ClientContentCryptoService(messageInvoker, TimestampServiceHandler.GetUri, cryptoService);
+        }
+
+        public EncryptedApiClient(HttpClient messageInvoker, string secretKeyPassword, string initialVectorPassword, string hashKeyString)
+            : base(messageInvoker)
+        {
+            var cryptoService = new DefaultCryptoService(secretKeyPassword, initialVectorPassword, hashKeyString);
+
+            //this.contentCryptoService = new ClientContentCryptoService(messageInvoker, TimestampServiceHandler.GetUri, cryptoService);
         }
 
         public event EventHandler<HttpRequestEventArgs> EncryptingRequest;
@@ -35,9 +41,9 @@ namespace ApiFoundation.Services
             base.OnSendingRequest(e);
 
             var requestMessage = e.RequestMessage;
-            if (requestMessage.RequestUri.LocalPath != TimestampService_Uri)
+            if (requestMessage.RequestUri.LocalPath != TimestampServiceHandler.GetUri)
             {
-                this.OnRequestEncrypting(e);
+                this.OnEncryptingRequest(e);
                 this.OnEncrypt(e);
                 this.OnRequestEncrypted(e);
             }
@@ -47,9 +53,9 @@ namespace ApiFoundation.Services
         {
             var responseMessage = e.ResponseMessage;
             var requestMessage = responseMessage.RequestMessage;
-            if (requestMessage.RequestUri.LocalPath != TimestampService_Uri)
+            if (requestMessage.RequestUri.LocalPath != TimestampServiceHandler.GetUri)
             {
-                this.OnResponseDecrypting(e);
+                this.OnDecryptingResponse(e);
                 this.OnDecrypt(e);
                 this.OnResponseDecrypted(e);
             }
@@ -57,7 +63,7 @@ namespace ApiFoundation.Services
             base.OnResponseReceived(e);
         }
 
-        protected virtual void OnRequestEncrypting(HttpRequestEventArgs e)
+        protected virtual void OnEncryptingRequest(HttpRequestEventArgs e)
         {
             if (this.EncryptingRequest != null)
             {
@@ -73,7 +79,7 @@ namespace ApiFoundation.Services
             }
         }
 
-        protected virtual void OnResponseDecrypting(HttpResponseEventArgs e)
+        protected virtual void OnDecryptingResponse(HttpResponseEventArgs e)
         {
             if (this.DecryptingResponse != null)
             {
@@ -91,12 +97,19 @@ namespace ApiFoundation.Services
 
         protected virtual void OnEncrypt(HttpRequestEventArgs e)
         {
-            e.RequestMessage.Content = this.contentCryptoService.Encrypt(e.RequestMessage.Content);
+            //e.RequestMessage.Content = this.contentCryptoService.Encrypt(e.RequestMessage.Content);
         }
 
         protected virtual void OnDecrypt(HttpResponseEventArgs e)
         {
-            e.ResponseMessage.Content = this.contentCryptoService.Decrypt(e.ResponseMessage.Content);
+            try
+            {
+                //e.ResponseMessage.Content = this.contentCryptoService.Decrypt(e.ResponseMessage.Content);
+            }
+            catch (Exception ex)
+            {
+                throw new BadMessageException(ex);
+            }
         }
     }
 }

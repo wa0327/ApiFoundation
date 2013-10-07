@@ -3,7 +3,7 @@
 namespace ApiFoundation.Security.Cryptography
 {
     /// <summary>
-    /// The encryptor interface
+    /// 完整的料加/解密服務介面，需提供時戳。
     /// </summary>
     public interface ICryptoService : IDisposable
     {

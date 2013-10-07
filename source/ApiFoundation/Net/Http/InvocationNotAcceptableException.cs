@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Http;
 
-namespace ApiFoundation.Services
+namespace ApiFoundation.Net.Http
 {
     /// <summary>
     /// 當呼叫端的要求無法讓被呼叫端接受處理誤時擲出。
@@ -16,7 +16,7 @@ namespace ApiFoundation.Services
         /// </summary>
         /// <param name="httpError">The HTTP error.</param>
         /// <exception cref="System.ArgumentNullException">errorCode</exception>
-        public InvocationNotAcceptableException(HttpError httpError)
+        internal InvocationNotAcceptableException(HttpError httpError)
             : base(httpError.Message)
         {
             this.httpError = httpError;

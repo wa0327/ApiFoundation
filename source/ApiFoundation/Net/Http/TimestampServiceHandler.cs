@@ -15,7 +15,7 @@ namespace ApiFoundation.Net.Http
         internal const string RouteTemplate = "!timestamp!/{action}";
         internal const string GetUri = "/!timestamp!/get";
 
-        internal static TimestampServiceHandler Register(HttpConfiguration configuration, ITimestampService timestampService)
+        internal static TimestampServiceHandler Register(HttpConfiguration configuration, ITimestampProvider timestampProvider)
         {
             TimestampServiceHandler handler;
 
@@ -30,20 +30,20 @@ namespace ApiFoundation.Net.Http
                 configuration.Routes.MapHttpRoute(ServiceName, RouteTemplate, null, null, handler);
             }
 
-            handler.TimestampService = timestampService;
+            handler.TimestampProvider = timestampProvider;
 
             return handler;
         }
 
-        private ITimestampService service;
+        private ITimestampProvider timestampProvider;
 
         private TimestampServiceHandler()
         {
         }
 
-        internal ITimestampService TimestampService
+        internal ITimestampProvider TimestampProvider
         {
-            get { return this.service; }
+            get { return this.timestampProvider; }
             set
             {
                 if (value == null)
@@ -51,7 +51,7 @@ namespace ApiFoundation.Net.Http
                     throw new ArgumentNullException("null");
                 }
 
-                this.service = value;
+                this.timestampProvider = value;
             }
         }
 
@@ -61,7 +61,7 @@ namespace ApiFoundation.Net.Http
 
             string timestamp;
             DateTime expires;
-            this.service.GetTimestamp(out timestamp, out expires);
+            this.timestampProvider.GetTimestamp(out timestamp, out expires);
 
             var response = new
             {

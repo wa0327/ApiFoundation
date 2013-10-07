@@ -35,7 +35,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServerTest_RequestAndResponse()
+        public void ApiServer_RequestAndResponse()
         {
             this.client.Post<SmokeTestRequest, SmokeTestResponse>(
                 "/api/ApiServerTest/RequestAndResponse",
@@ -61,7 +61,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServerTest_RequestOnly()
+        public void ApiServer_RequestOnly()
         {
             this.client.Post<SmokeTestRequest, object>(
                 "/api/ApiServerTest/RequestOnly",
@@ -79,7 +79,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServerTest_NullRequest()
+        public void ApiServer_NullRequest()
         {
             this.client.Post<SmokeTestRequest, object>(
                 "/api/ApiServerTest/NullRequest",
@@ -88,7 +88,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServerTest_ResponseOnly()
+        public void ApiServer_ResponseOnly()
         {
             this.client.Post<object, SmokeTestResponse>(
                 "/api/ApiServerTest/ResponseOnly",
@@ -105,7 +105,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServerTest_NullResponse()
+        public void ApiServer_NullResponse()
         {
             this.client.Post<object, SmokeTestResponse>(
                 "/api/ApiServerTest/NullResponse",
@@ -114,7 +114,7 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiServerTest_ActionOnly()
+        public void ApiServer_ActionOnly()
         {
             this.client.Post<object, object>("/api/ApiServerTest/ActionOnly", null, null);
         }
