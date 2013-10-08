@@ -186,21 +186,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\test\ApiFoundation.Test\Web\Http\Controllers\ApiServerTestController.cs">
-      <Link>Web\Http\Controllers\ApiServerTestController.cs</Link>
-    </Compile>
-    <Compile Include="..\..\test\ApiFoundation.Test\Web\Http\Controllers\BusinessErrorException.cs">
-      <Link>Web\Http\Controllers\BusinessErrorException.cs</Link>
-    </Compile>
-    <Compile Include="..\..\test\ApiFoundation.Test\Web\Http\Controllers\InvalidModelRequest.cs">
-      <Link>Web\Http\Controllers\InvalidModelRequest.cs</Link>
-    </Compile>
-    <Compile Include="..\..\test\ApiFoundation.Test\Web\Http\Controllers\SmokeTestRequest.cs">
-      <Link>Web\Http\Controllers\SmokeTestRequest.cs</Link>
-    </Compile>
-    <Compile Include="..\..\test\ApiFoundation.Test\Web\Http\Controllers\SmokeTestResponse.cs">
-      <Link>Web\Http\Controllers\SmokeTestResponse.cs</Link>
-    </Compile>
     <Compile Include="Areas\HelpPage\ApiDescriptionExtensions.cs" />
     <Compile Include="Areas\HelpPage\App_Start\HelpPageConfig.cs" />
     <Compile Include="Areas\HelpPage\Controllers\HelpController.cs" />
@@ -216,15 +201,20 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Configuration\CryptoGraphySettings.cs" />
+    <Compile Include="Web\Http\Controllers\ApiServerTestController.cs" />
+    <Compile Include="Web\Http\Controllers\BusinessErrorException.cs" />
     <Compile Include="Web\Http\Controllers\ExceptionTestController.cs" />
     <Compile Include="Web\Http\Controllers\ExceptionTestException.cs" />
+    <Compile Include="Web\Http\Controllers\InvalidModelRequest.cs" />
+    <Compile Include="Web\Http\Controllers\SmokeTestRequest.cs" />
+    <Compile Include="Web\Http\Controllers\SmokeTestResponse.cs" />
     <Compile Include="Web\Http\Filters\CustomExceptionFilter.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Web\Http\ServerMessageDumper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="Filters\" />
     <Folder Include="Properties\" />
   </ItemGroup>

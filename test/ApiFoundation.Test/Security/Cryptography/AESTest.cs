@@ -10,7 +10,7 @@ namespace ApiFoundation.Security.Cryptography
     public class AESTest
     {
         [TestMethod]
-        public void AES_Encrypt()
+        public void AESTest_Encrypt()
         {
             using (var target = new AES("123456789012345678901234", "12345678"))
             {
@@ -27,7 +27,7 @@ namespace ApiFoundation.Security.Cryptography
         }
 
         [TestMethod]
-        public void AES_Decrypt()
+        public void AESTest_Decrypt()
         {
             using (var target = new AES("123456789012345678901234", "12345678"))
             {

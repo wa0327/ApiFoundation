@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ApiFoundation.Services
+namespace ApiFoundation.Net.Http
 {
     public sealed class BadMessageException : Exception
     {

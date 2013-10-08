@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading;
 
-namespace ApiFoundation.Net.Http
+namespace ApiFoundation.Web.Http
 {
     internal sealed class ServerMessageDumper : MessageProcessingHandler
     {

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Configuration;
-using System.Diagnostics;
-using System.Text;
+using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using ApiFoundation.Configuration;
-using ApiFoundation.Net.Http;
 using ApiFoundation.Security.Cryptography;
-using ApiFoundation.Services;
+using ApiFoundation.Web.Http;
 using ApiFoundation.Web.Http.Filters;
 
 namespace ApiFoundation.WebApp
@@ -26,6 +25,10 @@ namespace ApiFoundation.WebApp
 
             config.Filters.Add(new ModelStateFilter());
             config.Filters.Add(new CustomExceptionFilter());
+
+            // register global timestamp service.
+            config.MessageHandlers.Add(new ServerMessageDumper());
+            config.MessageHandlers.Add(new TimestampHandler(config, "!timestamp!/get", new DefaultTimestampProvider()));
 
             AreaRegistration.RegisterAllAreas();
         }
@@ -53,42 +56,13 @@ namespace ApiFoundation.WebApp
             // 或 SQLServer，就不會引發這個事件。
         }
 
-        private ApiServer CreateRoute(HttpConfiguration configuration)
+        private void CreateRoute(HttpConfiguration configuration)
         {
-            var route = new ApiServer(configuration, "API Default", "api/{controller}/{action}", null, null, null);
-
-            route.RequestReceived += (sender, e) =>
-            {
-                Trace.TraceInformation("RECV from {0}", e.RequestMessage.Headers.From);
-
-                if (e.RequestMessage.Content != null)
-                {
-                    var header = e.RequestMessage.Content.Headers;
-                    Trace.TraceInformation("HEADER: {0}", header);
-
-                    var raw = e.RequestMessage.Content.ReadAsStringAsync().Result;
-                    Trace.TraceInformation("RAW: {0}", raw);
-                }
-            };
-
-            route.SendingResponse += (sender, e) =>
-            {
-                Trace.TraceInformation("SEND to {0}", e.ResponseMessage.RequestMessage.Headers.From);
-
-                if (e.ResponseMessage.Content != null)
-                {
-                    var header = e.ResponseMessage.Content.Headers;
-                    Trace.TraceInformation("HEADER: {0}", header);
-
-                    var raw = e.ResponseMessage.Content.ReadAsStringAsync().Result;
-                    Trace.TraceInformation("RAW: {0}", raw);
-                }
-            };
-
-            return route;
+            // register HTTP route.
+            configuration.Routes.MapHttpRoute("API Default", "api/{controller}/{action}");
         }
 
-        private ApiServer CreateEncryptedRoute(HttpConfiguration configuration)
+        private void CreateEncryptedRoute(HttpConfiguration configuration)
         {
             var section = (NameValueCollection)ConfigurationManager.GetSection("Api2CryptoGraphySettings");
             if (section == null)
@@ -96,75 +70,19 @@ namespace ApiFoundation.WebApp
                 throw new ApplicationException("Config section 'RestfulWebService' has not been set.");
             }
 
+            // arrange.
             var settings = new CryptoGraphySettings(section);
-            var route = new EncryptedApiServer(
-                configuration,
-                "Encrypted Route",
-                "api2/{controller}/{action}",
-                null,
-                null,
-                null,
-                settings.SecretKey,
-                settings.InitialVector,
-                settings.HashKey);
+            var timestampProvider = new DefaultTimestampProvider();
+            var cryptoHandler = new ServerCryptoHandler(settings.SecretKey, settings.InitialVector, settings.HashKey, timestampProvider);
+            var injection = new DelegatingHandler[] { cryptoHandler, new ServerMessageDumper() };
+            var handler = HttpClientFactory.CreatePipeline(new HttpControllerDispatcher(configuration), injection);
 
-            route.DecryptingRequest += (sender, e) =>
-            {
-                Trace.TraceInformation("DecryptingRequest");
+            // register encrypted HTTP route.
+            configuration.Routes.MapHttpRoute("Encrypted Route", "api2/{controller}/{action}", null, null, handler);
 
-                if (e.RequestMessage.Content != null)
-                {
-                    var header = e.RequestMessage.Content.Headers;
-                    Trace.TraceInformation("HEADER: {0}", header);
-
-                    var raw = e.RequestMessage.Content.ReadAsStringAsync().Result;
-                    Trace.TraceInformation("RAW: {0}", raw);
-                }
-            };
-
-            route.RequestDecrypted += (sender, e) =>
-            {
-                Trace.TraceInformation("RequestDecrypted");
-
-                if (e.RequestMessage.Content != null)
-                {
-                    var header = e.RequestMessage.Content.Headers;
-                    Trace.TraceInformation("HEADER: {0}", header);
-
-                    var raw = e.RequestMessage.Content.ReadAsStringAsync().Result;
-                    Trace.TraceInformation("RAW: {0}", raw);
-                }
-            };
-
-            route.EncryptingResponse += (sender, e) =>
-            {
-                Trace.TraceInformation("EncryptingResponse");
-
-                if (e.ResponseMessage.Content != null)
-                {
-                    var header = e.ResponseMessage.Content.Headers;
-                    Trace.TraceInformation("HEADER: {0}", header);
-
-                    var raw = e.ResponseMessage.Content.ReadAsStringAsync().Result;
-                    Trace.TraceInformation("RAW: {0}", raw);
-                }
-            };
-
-            route.ResponseEncrypted += (sender, e) =>
-            {
-                Trace.TraceInformation("ResponseEncrypted");
-
-                if (e.ResponseMessage.Content != null)
-                {
-                    var header = e.ResponseMessage.Content.Headers;
-                    Trace.TraceInformation("HEADER: {0}", header);
-
-                    var raw = e.ResponseMessage.Content.ReadAsStringAsync().Result;
-                    Trace.TraceInformation("RAW: {0}", raw);
-                }
-            };
-
-            return route;
+            // register timestamp service.
+            var timestampHandler = new TimestampHandler(timestampProvider);
+            configuration.Routes.MapHttpRoute("Timestamp Route", "api3/!timestamp!/get", null, null, timestampHandler);
         }
     }
 }

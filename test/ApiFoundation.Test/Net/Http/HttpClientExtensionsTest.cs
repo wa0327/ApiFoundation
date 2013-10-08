@@ -1,25 +1,29 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Authentication;
-using ApiFoundation.Net.Http;
+using System.Text;
 using ApiFoundation.Utility;
+using ApiFoundation.Web.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 
-namespace ApiFoundation.Services
+namespace ApiFoundation.Net.Http
 {
     [TestClass]
-    public class ApiClientTest
+    public class HttpClientExtensionsTest
     {
         [TestMethod]
-        public void ApiClient_NoAction()
+        public void HttpClientExtensionsTest_NoAction()
         {
-            using (var server = new ApiServerWrapper())
-            using (ApiClient client = new ApiClientWrapper())
+            using (var server = new HttpServerWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
                 try
                 {
-                    client.Post<object, object>(
+                    client.PostJson<object, object>(
                         "/api/ApiServerTest/NoAction",
                         null,
                         null);
@@ -36,14 +40,14 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiClient_NoController()
+        public void HttpClientExtensionsTest_NoController()
         {
-            using (var server = new ApiServerWrapper())
-            using (ApiClient client = new ApiClientWrapper())
+            using (var server = new HttpServerWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
                 try
                 {
-                    client.Post<object, object>(
+                    client.PostJson<object, object>(
                         "/api/NoController/NoAction",
                         null,
                         null);
@@ -60,13 +64,13 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiClient_NoServer()
+        public void HttpClientExtensionsTest_NoServer()
         {
-            using (ApiClient target = new ApiClientWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
                 try
                 {
-                    target.Post<object, object>(
+                    client.PostJson<object, object>(
                         "http://localhost:9876/api/AnyController/AnyAction",
                         null,
                         null);
@@ -91,13 +95,13 @@ namespace ApiFoundation.Services
         /// LMS API server 憑證有問題，所以應當收到 WebException 例外。
         /// </summary>
         [TestMethod]
-        public void ApiClient_LmsApi_InvalidCertificate()
+        public void HttpClientExtensionsTest_LmsApi_InvalidCertificate()
         {
-            using (ApiClient target = new ApiClientWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
                 try
                 {
-                    target.Post<object, string>(
+                    client.PostJson<object, string>(
                         "https://lmsapi.eos.net.tw:8443/AnyController/AnyAction",
                         null,
                         null);
@@ -125,16 +129,16 @@ namespace ApiFoundation.Services
         /// LMS API 的 GetTimeStamp 應該用 GET，所以應當收到 HttpServiceException 例外。
         /// </summary>
         [TestMethod]
-        public void ApiClient_LmsApi_GetTimestamp_InvalidMethod()
+        public void HttpClientExtensionsTest_LmsApi_GetTimestamp_InvalidMethod()
         {
             // 略過憑證檢查
             ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
-            using (ApiClient target = new ApiClientWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
                 try
                 {
-                    target.Post<object, string>(
+                    client.PostJson<object, string>(
                         "https://lmsapi.eos.net.tw:8443/api/TimeStampService/GetTimeStamp",
                         null,
                         null);
@@ -152,14 +156,14 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiClient_LmsApi_GetTimestamp()
+        public void HttpClientExtensionsTest_LmsApi_GetTimestamp()
         {
             // 略過憑證檢查
             ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
 
-            using (ApiClient target = new ApiClientWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
-                target.Get<string>(
+                client.GetJson<string>(
                     "https://lmsapi.eos.net.tw:8443/api/TimeStampService/GetTimeStamp",
                     response =>
                     {
@@ -174,11 +178,11 @@ namespace ApiFoundation.Services
         }
 
         [TestMethod]
-        public void ApiClient_ErpApi_GetUserAuthority()
+        public void HttpClientExtensionsTest_ErpApi_GetUserAuthority()
         {
-            using (ApiClient target = new ApiClientWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
-                target.Post<object, JObject>(
+                client.PostJson<object, JObject>(
                     "http://erpapi.self.monday:9999/api/User/GetAuthority",
                     () =>
                     {

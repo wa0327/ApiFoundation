@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Net.Http;
+using System.Web.Http;
 using ApiFoundation.Net.Http;
-using ApiFoundation.Services;
 using ApiFoundation.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -10,10 +11,10 @@ namespace ApiFoundation.Web.Http.Filters
     public class ExceptionFilterTest
     {
         [TestMethod]
-        public void ExceptionFilter_BusinessError()
+        public void ExceptionFilterTest_BusinessError()
         {
-            using (var server = new ApiServerWrapper())
-            using (ApiClient client = new ApiClientWrapper())
+            using (var server = new HttpServerWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
                 var exceptionFilter = new ExceptionFilter();
                 exceptionFilter.Exception += (sender, e) =>
@@ -26,7 +27,7 @@ namespace ApiFoundation.Web.Http.Filters
 
                 try
                 {
-                    client.Post<object, object>(
+                    client.PostJson<object, object>(
                         "/api/ApiServerTest/BusinessErrorTest",
                         null,
                         null
@@ -43,10 +44,10 @@ namespace ApiFoundation.Web.Http.Filters
         }
 
         [TestMethod]
-        public void ExceptionFilter_BusinessError_Encrypted()
+        public void ExceptionFilterTest_BusinessError_Encrypted()
         {
-            using (var server = new EncryptedApiServerWrapper())
-            using (ApiClient client = new EncryptedApiClientWrapper())
+            using (var server = new EncryptedHttpRouteWrapper())
+            using (HttpClient client = new EncryptedHttpClientWrapper())
             {
                 var exceptionFilter = new ExceptionFilter();
                 exceptionFilter.Exception += (sender, e) =>
@@ -59,53 +60,7 @@ namespace ApiFoundation.Web.Http.Filters
 
                 try
                 {
-                    client.Post<object, object>(
-                        "/api/ApiServerTest/BusinessErrorTest",
-                        null,
-                        null
-                    );
-
-                    Assert.Fail("Did not throw expected exception InvocationNotAcceptableException.");
-                }
-                catch (InvocationNotAcceptableException ex)
-                {
-                    Assert.AreEqual("中毒太深", ex.Message);
-                    Assert.AreEqual("7533967", ex.ErrorCode);
-                }
-            }
-        }
-
-        [TestMethod]
-        public void ExceptionFilter_BusinessError_IIS()
-        {
-            using (ApiClient client = new ApiClientWrapper("http://apifoundation.self.monday:9999"))
-            {
-                try
-                {
-                    client.Post<object, object>(
-                        "/api/ApiServerTest/BusinessErrorTest",
-                        null,
-                        null
-                    );
-
-                    Assert.Fail("Did not throw expected exception InvocationNotAcceptableException.");
-                }
-                catch (InvocationNotAcceptableException ex)
-                {
-                    Assert.AreEqual("中毒太深", ex.Message);
-                    Assert.AreEqual("7533967", ex.ErrorCode);
-                }
-            }
-        }
-
-        [TestMethod]
-        public void ExceptionFilter_BusinessError_IIS_Encrypted()
-        {
-            using (ApiClient client = new EncryptedApiClientWrapper("http://apifoundation.self.monday:9999"))
-            {
-                try
-                {
-                    client.Post<object, object>(
+                    client.PostJson<object, object>(
                         "/api2/ApiServerTest/BusinessErrorTest",
                         null,
                         null
@@ -122,16 +77,62 @@ namespace ApiFoundation.Web.Http.Filters
         }
 
         [TestMethod]
-        public void ExceptionFilter_ProgramError()
+        public void ExceptionFilterTest_BusinessError_IIS()
         {
-            using (var server = new ApiServerWrapper())
-            using (ApiClient client = new ApiClientWrapper())
+            using (HttpClient client = new HttpClientWrapper("http://apifoundation.self.monday:9999"))
+            {
+                try
+                {
+                    client.PostJson<object, object>(
+                        "/api/ApiServerTest/BusinessErrorTest",
+                        null,
+                        null
+                    );
+
+                    Assert.Fail("Did not throw expected exception InvocationNotAcceptableException.");
+                }
+                catch (InvocationNotAcceptableException ex)
+                {
+                    Assert.AreEqual("中毒太深", ex.Message);
+                    Assert.AreEqual("7533967", ex.ErrorCode);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ExceptionFilterTest_BusinessError_IIS_Encrypted()
+        {
+            using (HttpClient client = new EncryptedHttpClientWrapper("http://apifoundation.self.monday:9999"))
+            {
+                try
+                {
+                    client.PostJson<object, object>(
+                        "/api2/ApiServerTest/BusinessErrorTest",
+                        null,
+                        null
+                    );
+
+                    Assert.Fail("Did not throw expected exception InvocationNotAcceptableException.");
+                }
+                catch (InvocationNotAcceptableException ex)
+                {
+                    Assert.AreEqual("中毒太深", ex.Message);
+                    Assert.AreEqual("7533967", ex.ErrorCode);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ExceptionFilterTest_ProgramError()
+        {
+            using (var server = new HttpServerWrapper())
+            using (HttpClient client = new HttpClientWrapper())
             {
                 server.Configuration.Filters.Add(new ExceptionFilter());
 
                 try
                 {
-                    client.Post<object, object>(
+                    client.PostJson<object, object>(
                         "/api/ApiServerTest/ProgramErrorTest",
                         null,
                         null
@@ -148,17 +149,17 @@ namespace ApiFoundation.Web.Http.Filters
         }
 
         [TestMethod]
-        public void ExceptionFilter_ProgramError_Encrypted()
+        public void ExceptionFilterTest_ProgramError_Encrypted()
         {
-            using (var server = new EncryptedApiServerWrapper())
-            using (ApiClient client = new EncryptedApiClientWrapper())
+            using (var server = new EncryptedHttpRouteWrapper())
+            using (HttpClient client = new EncryptedHttpClientWrapper())
             {
                 server.Configuration.Filters.Add(new ExceptionFilter());
 
                 try
                 {
-                    client.Post<object, object>(
-                        "/api/ApiServerTest/ProgramErrorTest",
+                    client.PostJson<object, object>(
+                        "/api2/ApiServerTest/ProgramErrorTest",
                         null,
                         null
                     );
@@ -174,13 +175,13 @@ namespace ApiFoundation.Web.Http.Filters
         }
 
         [TestMethod]
-        public void ExceptionFilter_ProgramError_IIS()
+        public void ExceptionFilterTest_ProgramError_IIS()
         {
-            using (ApiClient client = new ApiClientWrapper("http://apifoundation.self.monday:9999"))
+            using (HttpClient client = new HttpClientWrapper("http://apifoundation.self.monday:9999"))
             {
                 try
                 {
-                    client.Post<object, object>(
+                    client.PostJson<object, object>(
                         "/api/ApiServerTest/ProgramErrorTest",
                         null,
                         null
@@ -198,13 +199,13 @@ namespace ApiFoundation.Web.Http.Filters
         }
 
         [TestMethod]
-        public void ExceptionFilter_ProgramError_IIS_Encrypted()
+        public void ExceptionFilterTest_ProgramError_IIS_Encrypted()
         {
-            using (ApiClient client = new EncryptedApiClientWrapper("http://apifoundation.self.monday:9999"))
+            using (HttpClient client = new EncryptedHttpClientWrapper("http://apifoundation.self.monday:9999"))
             {
                 try
                 {
-                    client.Post<object, object>(
+                    client.PostJson<object, object>(
                         "/api2/ApiServerTest/ProgramErrorTest",
                         null,
                         null

@@ -80,26 +80,40 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\source\ApiFoundation.WebApp\Web\Http\Controllers\ApiServerTestController.cs">
+      <Link>Web\Http\Controllers\ApiServerTestController.cs</Link>
+    </Compile>
+    <Compile Include="..\..\source\ApiFoundation.WebApp\Web\Http\Controllers\BusinessErrorException.cs">
+      <Link>Web\Http\Controllers\BusinessErrorException.cs</Link>
+    </Compile>
+    <Compile Include="..\..\source\ApiFoundation.WebApp\Web\Http\Controllers\InvalidModelRequest.cs">
+      <Link>Web\Http\Controllers\InvalidModelRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\source\ApiFoundation.WebApp\Web\Http\Controllers\SmokeTestRequest.cs">
+      <Link>Web\Http\Controllers\SmokeTestRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\source\ApiFoundation.WebApp\Web\Http\Controllers\SmokeTestResponse.cs">
+      <Link>Web\Http\Controllers\SmokeTestResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\..\source\ApiFoundation.WebApp\Web\Http\ServerMessageDumper.cs">
+      <Link>Web\Http\ServerMessageDumper.cs</Link>
+    </Compile>
     <Compile Include="Net\Http\ClientMessageDumper.cs" />
-    <Compile Include="Net\Http\EncryptedHttpClientHandlerTest.cs" />
-    <Compile Include="Net\Http\EncryptedHttpClientWrapper.cs" />
-    <Compile Include="Net\Http\ServerMessageDumper.cs" />
+    <Compile Include="Net\Http\EncryptedHttpClientTest.cs" />
+    <Compile Include="Net\Http\HttpClientExtensionsTest.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utility\EncryptedHttpClientWrapper.cs" />
+    <Compile Include="Utility\EncryptedHttpServerWrapper.cs" />
+    <Compile Include="Utility\HttpClientWrapper.cs" />
+    <Compile Include="Web\Http\EncryptedHttpRouteTest.cs" />
+    <Compile Include="Utility\EncryptedHttpRouteWrapper.cs" />
+    <Compile Include="Utility\HttpServerWrapper.cs" />
     <Compile Include="Security\Cryptography\AESTest.cs" />
     <Compile Include="Security\Cryptography\DefaultCryptoServiceTest.cs" />
-    <Compile Include="Services\ApiClientTest.cs" />
-    <Compile Include="Services\ApiServerTest.cs" />
-    <Compile Include="Services\EncryptedApiServerTest.cs" />
-    <Compile Include="Utility\EncryptedApiClientWrapper.cs" />
-    <Compile Include="Utility\ApiClientWrapper.cs" />
-    <Compile Include="Utility\EncryptedApiServerWrapper.cs" />
-    <Compile Include="Utility\ApiServerWrapper.cs" />
-    <Compile Include="Web\Http\Controllers\ApiServerTestController.cs" />
-    <Compile Include="Web\Http\Controllers\InvalidModelRequest.cs" />
-    <Compile Include="Web\Http\Controllers\BusinessErrorException.cs" />
-    <Compile Include="Web\Http\Controllers\SmokeTestRequest.cs" />
-    <Compile Include="Web\Http\Controllers\SmokeTestResponse.cs" />
     <Compile Include="Web\Http\Filters\ExceptionFilterTest.cs" />
     <Compile Include="Web\Http\Filters\ModelStateFilterTest.cs" />
+    <Compile Include="Web\Http\TimestampHandlerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

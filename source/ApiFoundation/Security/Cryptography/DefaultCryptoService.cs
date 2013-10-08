@@ -98,6 +98,16 @@ namespace ApiFoundation.Security.Cryptography
 
         private string ComputeSignature(byte[] cipher, string timestamp)
         {
+            if (cipher == null)
+            {
+                throw new ArgumentNullException("cipher");
+            }
+
+            if (timestamp == null)
+            {
+                throw new ArgumentNullException("timestamp");
+            }
+
             var hashBase = Convert.ToBase64String(cipher) + timestamp;
             var hashBaseBytes = Encoding.UTF8.GetBytes(hashBase);
             var hash = this.hashAlgorithm.ComputeHash(hashBaseBytes);

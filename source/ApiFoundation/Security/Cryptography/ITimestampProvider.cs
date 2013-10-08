@@ -9,6 +9,7 @@ namespace ApiFoundation.Security.Cryptography
         /// </summary>
         TimeSpan Duration { get; set; }
 
+        // TODO: 不可回傳 expires，需移除。
         void GetTimestamp(out string timestamp, out DateTime expires);
 
         /// <summary>

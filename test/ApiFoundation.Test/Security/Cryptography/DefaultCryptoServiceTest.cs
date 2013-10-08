@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
-using ApiFoundation.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ApiFoundation.Security.Cryptography
@@ -13,7 +8,7 @@ namespace ApiFoundation.Security.Cryptography
     public class DefaultCryptoServiceTest
     {
         [TestMethod]
-        public void DefaultCryptoService_Encrypt()
+        public void DefaultCryptoServiceTest_Encrypt()
         {
             using (var target = new DefaultCryptoService("123456789012345678901234", "12345678", "1234567890"))
             {
@@ -37,7 +32,7 @@ namespace ApiFoundation.Security.Cryptography
         }
 
         [TestMethod]
-        public void DefaultCryptoService_Decrypt()
+        public void DefaultCryptoServiceTest_Decrypt()
         {
             using (var target = new DefaultCryptoService("123456789012345678901234", "12345678", "1234567890"))
             {
@@ -57,7 +52,7 @@ namespace ApiFoundation.Security.Cryptography
         }
 
         [TestMethod]
-        public void DefaultCryptoService_Encrypt_then_Decrypt()
+        public void DefaultCryptoServiceTest_Encrypt_then_Decrypt()
         {
             using (var target = new DefaultCryptoService("123456789012345678901234", "12345678", "1234567890"))
             {

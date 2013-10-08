@@ -24,7 +24,7 @@ namespace ApiFoundation.Net.Http
 
         protected override HttpResponseMessage ProcessResponse(HttpResponseMessage response, CancellationToken cancellationToken)
         {
-            Trace.TraceInformation("[RECV {0}]", response.RequestMessage.RequestUri);
+            Trace.TraceInformation("[RECV {1} {0}]", response.RequestMessage.RequestUri, response.StatusCode);
 
             if (response.Content != null)
             {

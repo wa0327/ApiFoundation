@@ -28,8 +28,8 @@ namespace ApiFoundation.Security.Cryptography
 
         public TimeSpan Duration
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get { throw new NotSupportedException(); }
+            set { throw new NotSupportedException(); }
         }
 
         public void GetTimestamp(out string timestamp, out DateTime expires)
@@ -44,7 +44,7 @@ namespace ApiFoundation.Security.Cryptography
 
         public void Validate(string timestamp)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }
