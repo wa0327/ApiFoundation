@@ -14,7 +14,7 @@ namespace ApiFoundation.Utility
             var baseUri = new Uri(baseAddress);
 
             // create HTTP client.
-            this.inner = HttpClientFactory.Create(new HttpClientHandler(), new ClientMessageDumper());
+            this.inner = HttpClientFactory.Create(new ClientMessageDumper());
             this.inner.BaseAddress = baseUri;
         }
 

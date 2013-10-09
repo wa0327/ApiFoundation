@@ -42,6 +42,9 @@
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Rhino.Mocks">
+      <HintPath>..\..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core">
@@ -99,6 +102,8 @@
       <Link>Web\Http\ServerMessageDumper.cs</Link>
     </Compile>
     <Compile Include="Net\Http\ClientMessageDumper.cs" />
+    <Compile Include="Net\Http\DefaultHttpMessageCryptoServiceTest.cs" />
+    <Compile Include="Net\Http\DefaultTimestampProviderTest.cs" />
     <Compile Include="Net\Http\EncryptedHttpClientTest.cs" />
     <Compile Include="Net\Http\HttpClientExtensionsTest.cs">
       <SubType>Code</SubType>
@@ -113,7 +118,7 @@
     <Compile Include="Security\Cryptography\DefaultCryptoServiceTest.cs" />
     <Compile Include="Web\Http\Filters\ExceptionFilterTest.cs" />
     <Compile Include="Web\Http\Filters\ModelStateFilterTest.cs" />
-    <Compile Include="Web\Http\TimestampHandlerTest.cs" />
+    <Compile Include="Web\Http\HttpTimestampHandlerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

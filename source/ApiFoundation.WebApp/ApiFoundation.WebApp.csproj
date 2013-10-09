@@ -177,7 +177,9 @@
     <Content Include="Scripts\knockout-2.2.1.debug.js" />
     <Content Include="Scripts\knockout-2.2.1.js" />
     <Content Include="Scripts\WebApiTestClient.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -201,6 +203,8 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Configuration\CryptoGraphySettings.cs" />
+    <Compile Include="Web\MyHttpModule.cs" />
+    <Compile Include="Web\MyHttpHandler.cs" />
     <Compile Include="Web\Http\Controllers\ApiServerTestController.cs" />
     <Compile Include="Web\Http\Controllers\BusinessErrorException.cs" />
     <Compile Include="Web\Http\Controllers\ExceptionTestController.cs" />
@@ -276,8 +280,8 @@
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>2235</DevelopmentServerPort>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>8591</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://apifoundation.self.monday:9999/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Dispatcher;
 using System.Web.Http.SelfHost;
-using ApiFoundation.Security.Cryptography;
+using ApiFoundation.Net.Http;
 using ApiFoundation.Web.Http;
 
 namespace ApiFoundation.Utility
@@ -18,12 +16,13 @@ namespace ApiFoundation.Utility
             var configuration = new HttpSelfHostConfiguration(baseAddress);
 
             // arrange.
-            var timestampProvider = new DefaultTimestampProvider();
+            var timestampProvider = new DefaultTimestampProvider(TimeSpan.FromMinutes(15));
             var cryptoHandler = new ServerCryptoHandler("secretKeyPassword", "initialVectorPassword", "hashKeyString", timestampProvider);
 
             // register handlers.
             configuration.MessageHandlers.Add(new ServerMessageDumper());
-            configuration.MessageHandlers.Add(new TimestampHandler(configuration, "!timestamp!/get", timestampProvider));
+            configuration.MessageHandlers.Add(new HttpTimestampHandler<long>(configuration, "api2/!timestamp!/get", timestampProvider));
+            configuration.Routes.MapHttpRoute("Fake Timestamp Route", "api2/!timestamp!/{action}");
 
             // startup local HTTP server.
             this.inner = new HttpSelfHostServer(configuration);

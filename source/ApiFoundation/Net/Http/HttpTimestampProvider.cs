@@ -3,9 +3,9 @@ using System.Net.Http;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 
-namespace ApiFoundation.Security.Cryptography
+namespace ApiFoundation.Net.Http
 {
-    public class HttpTimestampProvider : ITimestampProvider
+    public class HttpTimestampProvider<T> : ITimestampProvider<T>
     {
         private readonly HttpMessageInvoker messageInvoker;
         private readonly Uri timestampUri;
@@ -22,27 +22,25 @@ namespace ApiFoundation.Security.Cryptography
         }
 
         public HttpTimestampProvider(HttpMessageInvoker messageInvoker, string timestampUri)
-            : this(messageInvoker, new Uri(timestampUri))
+            : this(messageInvoker, new Uri(timestampUri, UriKind.RelativeOrAbsolute))
         {
         }
 
-        public TimeSpan Duration
+        void IDisposable.Dispose()
         {
-            get { throw new NotSupportedException(); }
-            set { throw new NotSupportedException(); }
+            this.messageInvoker.Dispose();
         }
 
-        public void GetTimestamp(out string timestamp, out DateTime expires)
+        T ITimestampProvider<T>.GetTimestamp()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, this.timestampUri);
             var response = this.messageInvoker.SendAsync(request, CancellationToken.None).Result;
             var responseContent = response.Content.ReadAsAsync<JObject>().Result;
 
-            timestamp = (string)responseContent["Timestamp"];
-            expires = (DateTime)responseContent["Expires"];
+            return responseContent["Timestamp"].Value<T>();
         }
 
-        public void Validate(string timestamp)
+        void ITimestampProvider<T>.Validate(T timestamp)
         {
             throw new NotSupportedException();
         }

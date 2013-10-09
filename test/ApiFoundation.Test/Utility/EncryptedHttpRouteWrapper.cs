@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Http.SelfHost;
-using ApiFoundation.Security.Cryptography;
+using ApiFoundation.Net.Http;
 using ApiFoundation.Web.Http;
 
 namespace ApiFoundation.Utility
@@ -16,9 +16,10 @@ namespace ApiFoundation.Utility
         internal EncryptedHttpRouteWrapper(string baseAddress)
         {
             var configuration = new HttpSelfHostConfiguration(baseAddress);
+            ITimestampProvider<long> timestampProvider = new DefaultTimestampProvider(TimeSpan.FromMinutes(15));
 
-            this.RegisterEncryptedRoute(configuration);
-            this.RegisterTimestampRoute(configuration);
+            this.RegisterEncryptedRoute(configuration, timestampProvider);
+            this.RegisterTimestampRoute(configuration, timestampProvider);
 
             // startup local HTTP server.
             this.inner = new HttpSelfHostServer(configuration);
@@ -43,10 +44,9 @@ namespace ApiFoundation.Utility
             this.inner.Dispose();
         }
 
-        private void RegisterEncryptedRoute(HttpConfiguration configuration)
+        private void RegisterEncryptedRoute(HttpConfiguration configuration, ITimestampProvider<long> timestampProvider)
         {
             // arrange.
-            var timestampProvider = new DefaultTimestampProvider();
             var cryptoHandler = new ServerCryptoHandler("secretKeyPassword", "initialVectorPassword", "hashKeyString", timestampProvider);
             var injection = new DelegatingHandler[] { new ServerMessageDumper(), cryptoHandler, new ServerMessageDumper() };
             var handler = HttpClientFactory.CreatePipeline(new HttpControllerDispatcher(configuration), injection);
@@ -55,11 +55,10 @@ namespace ApiFoundation.Utility
             configuration.Routes.MapHttpRoute("Encrypted API", "api2/{controller}/{action}", null, null, handler);
         }
 
-        private void RegisterTimestampRoute(HttpConfiguration configuration)
+        private void RegisterTimestampRoute(HttpConfiguration configuration, ITimestampProvider<long> timestampProvider)
         {
             // arrange.
-            var timestampProvider = new DefaultTimestampProvider();
-            var timestampHandler = new TimestampHandler(timestampProvider);
+            var timestampHandler = new HttpTimestampHandler<long>(timestampProvider);
             var injection = new DelegatingHandler[] { new ServerMessageDumper() };
             var handler = HttpClientFactory.CreatePipeline(timestampHandler, injection);
 

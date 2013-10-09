@@ -22,6 +22,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundation", "source\ApiFoundation\ApiFoundation.csproj", "{0FC6D045-A7CE-45C0-84F1-3A2471C26060}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundation.Test", "test\ApiFoundation.Test\ApiFoundation.Test.csproj", "{32070334-2094-4C16-A5AD-8038BC73CD13}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9F741FA4-FE0B-4FB5-9A93-62D99D0182E9} = {9F741FA4-FE0B-4FB5-9A93-62D99D0182E9}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiFoundation.WebApp", "source\ApiFoundation.WebApp\ApiFoundation.WebApp.csproj", "{9F741FA4-FE0B-4FB5-9A93-62D99D0182E9}"
 EndProject

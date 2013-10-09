@@ -10,7 +10,7 @@ namespace ApiFoundation.Web.Http
     {
         private readonly IHttpMessageCryptoService messageCryptoService;
 
-        public ServerCryptoHandler(ICryptoService cryptoService, ITimestampProvider timestampProvider)
+        public ServerCryptoHandler(ICryptoService cryptoService, ITimestampProvider<long> timestampProvider)
         {
             if (cryptoService == null)
             {
@@ -25,7 +25,7 @@ namespace ApiFoundation.Web.Http
             this.messageCryptoService = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider);
         }
 
-        public ServerCryptoHandler(string secretKeyPassword, string initialVectorPassword, string hashKeyString, ITimestampProvider timestampProvider)
+        public ServerCryptoHandler(string secretKeyPassword, string initialVectorPassword, string hashKeyString, ITimestampProvider<long> timestampProvider)
         {
             if (timestampProvider == null)
             {

@@ -10,12 +10,12 @@ namespace ApiFoundation.Net.Http
     {
         private readonly IHttpMessageCryptoService messageCryptoService;
 
-        public ClientCryptoHandler(ICryptoService cryptoService, ITimestampProvider timestampProvider)
+        public ClientCryptoHandler(ICryptoService cryptoService, ITimestampProvider<long> timestampProvider)
         {
             this.messageCryptoService = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider);
         }
 
-        public ClientCryptoHandler(string secretKeyPassword, string initialVectorPassword, string hashKeyString, ITimestampProvider timestampProvider)
+        public ClientCryptoHandler(string secretKeyPassword, string initialVectorPassword, string hashKeyString, ITimestampProvider<long> timestampProvider)
         {
             var cryptoService = new DefaultCryptoService(secretKeyPassword, initialVectorPassword, hashKeyString);
 

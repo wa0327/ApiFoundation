@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ApiFoundation.Security.Cryptography
+namespace ApiFoundation.Net.Http
 {
     public sealed class InvalidTimestampException : Exception
     {

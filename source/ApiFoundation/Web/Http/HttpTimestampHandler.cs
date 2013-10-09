@@ -5,14 +5,14 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-using ApiFoundation.Security.Cryptography;
+using ApiFoundation.Net.Http;
 
 namespace ApiFoundation.Web.Http
 {
-    public sealed class TimestampHandler : DelegatingHandler
+    public sealed class HttpTimestampHandler<T> : DelegatingHandler
     {
         private readonly string absolutePath;
-        private readonly ITimestampProvider timestampProvider;
+        private readonly ITimestampProvider<T> timestampProvider;
 
         /// <summary>
         /// Used to insert a global message handler.
@@ -20,7 +20,7 @@ namespace ApiFoundation.Web.Http
         /// <param name="configuration"></param>
         /// <param name="virtualPath"></param>
         /// <param name="timestampProvider"></param>
-        public TimestampHandler(HttpConfiguration configuration, string virtualPath, ITimestampProvider timestampProvider)
+        public HttpTimestampHandler(HttpConfiguration configuration, string virtualPath, ITimestampProvider<T> timestampProvider)
         {
             if (configuration == null)
             {
@@ -45,7 +45,7 @@ namespace ApiFoundation.Web.Http
         /// Used for a route handler.
         /// </summary>
         /// <param name="timestampProvider"></param>
-        public TimestampHandler(ITimestampProvider timestampProvider)
+        public HttpTimestampHandler(ITimestampProvider<T> timestampProvider)
         {
             if (timestampProvider == null)
             {
@@ -80,14 +80,9 @@ namespace ApiFoundation.Web.Http
 
         private HttpResponseMessage CreateTimestampResponse(HttpRequestMessage request)
         {
-            string timestamp;
-            DateTime expires;
-            this.timestampProvider.GetTimestamp(out timestamp, out expires);
-
             var response = new
             {
-                Timestamp = timestamp,
-                Expires = expires,
+                Timestamp = this.timestampProvider.GetTimestamp(),
             };
 
             return request.CreateResponse(HttpStatusCode.OK, response);

@@ -9,10 +9,10 @@ using Newtonsoft.Json.Linq;
 namespace ApiFoundation.Web.Http
 {
     [TestClass]
-    public class TimestampHandlerTest
+    public class HttpTimestampHandlerTest
     {
         [TestMethod]
-        public void TimestampHandlerTest_RouteHandler()
+        public void HttpTimestampHandlerTest_RouteHandler()
         {
             using (var server = new EncryptedHttpRouteWrapper())
             using (HttpClient client = new HttpClientWrapper())
@@ -23,32 +23,30 @@ namespace ApiFoundation.Web.Http
                     {
                         Assert.IsNotNull(response);
                         Assert.IsNotNull(response["Timestamp"]);
-                        Assert.IsNotNull(response["Expires"]);
                     }
                 );
             }
         }
 
         [TestMethod]
-        public void TimestampHandlerTest_GlobalHandler()
+        public void HttpTimestampHandlerTest_GlobalHandler()
         {
             using (var server = new EncryptedHttpServerWrapper())
             using (HttpClient client = new HttpClientWrapper())
             {
                 client.GetJson<JObject>(
-                    "/!timestamp!/get",
+                    "/api2/!timestamp!/get",
                     response =>
                     {
                         Assert.IsNotNull(response);
                         Assert.IsNotNull(response["Timestamp"]);
-                        Assert.IsNotNull(response["Expires"]);
                     }
                 );
             }
         }
 
         [TestMethod]
-        public void TimestampHandlerTest_RouteHandler_IIS()
+        public void HttpTimestampHandlerTest_RouteHandler_IIS()
         {
             using (HttpClient client = new HttpClientWrapper("http://apifoundation.self.monday:9999"))
             {
@@ -58,24 +56,22 @@ namespace ApiFoundation.Web.Http
                     {
                         Assert.IsNotNull(response);
                         Assert.IsNotNull(response["Timestamp"]);
-                        Assert.IsNotNull(response["Expires"]);
                     }
                 );
             }
         }
 
         [TestMethod]
-        public void TimestampHandlerTest_GlobalHandler_IIS()
+        public void HttpTimestampHandlerTest_GlobalHandler_IIS()
         {
             using (HttpClient client = new HttpClientWrapper("http://apifoundation.self.monday:9999"))
             {
                 client.GetJson<JObject>(
-                    "/!timestamp!/get",
+                    "/api2/!timestamp!/get",
                     response =>
                     {
                         Assert.IsNotNull(response);
                         Assert.IsNotNull(response["Timestamp"]);
-                        Assert.IsNotNull(response["Expires"]);
                     }
                 );
             }

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 
 namespace ApiFoundation.Net.Http
@@ -8,32 +9,56 @@ namespace ApiFoundation.Net.Http
     {
         protected override HttpRequestMessage ProcessRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            Trace.TraceInformation("[SEND {0}]", request.RequestUri);
+            var builder = new StringBuilder();
+            builder.AppendFormat("[SEND {0}]", request.RequestUri);
 
-            if (request.Content != null)
+            var content = request.Content;
+            if (content != null)
             {
-                var header = request.Content.Headers;
-                Trace.TraceInformation("[HEADER]\r\n{0}", header);
+                builder.AppendLine();
 
-                var raw = request.Content.ReadAsStringAsync().Result;
-                Trace.TraceInformation("[RAW]\r\n{0}", raw);
+                var header = content.Headers.ToString();
+                if (!string.IsNullOrEmpty(header))
+                {
+                    builder.AppendLine(header);
+                }
+
+                var raw = content.ReadAsStringAsync().Result;
+                if (!string.IsNullOrEmpty(raw))
+                {
+                    builder.AppendLine(raw);
+                }
             }
+
+            Trace.TraceInformation(builder.ToString());
 
             return request;
         }
 
         protected override HttpResponseMessage ProcessResponse(HttpResponseMessage response, CancellationToken cancellationToken)
         {
-            Trace.TraceInformation("[RECV {1} {0}]", response.RequestMessage.RequestUri, response.StatusCode);
+            var builder = new StringBuilder();
+            builder.AppendFormat("[RECV {0} {1}]", response.StatusCode, response.RequestMessage.RequestUri);
 
-            if (response.Content != null)
+            var content = response.Content;
+            if (content != null)
             {
-                var header = response.Content.Headers;
-                Trace.TraceInformation("[HEADER]\r\n{0}", header);
+                builder.AppendLine();
 
-                var raw = response.Content.ReadAsStringAsync().Result;
-                Trace.TraceInformation("[RAW]\r\n{0}", raw);
+                var header = content.Headers.ToString();
+                if (!string.IsNullOrEmpty(header))
+                {
+                    builder.AppendLine(header);
+                }
+
+                var raw = content.ReadAsStringAsync().Result;
+                if (!string.IsNullOrEmpty(raw))
+                {
+                    builder.AppendLine(raw);
+                }
             }
+
+            Trace.TraceInformation(builder.ToString());
 
             return response;
         }

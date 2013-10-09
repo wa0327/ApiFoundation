@@ -40,6 +40,11 @@ namespace ApiFoundation.Net.Http
 
             if (response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == HttpStatusCode.NoContent)
+                {
+                    return default(TResponseContent);
+                }
+
                 return response.Content.ReadAsAsync<TResponseContent>().Result;
             }
             else

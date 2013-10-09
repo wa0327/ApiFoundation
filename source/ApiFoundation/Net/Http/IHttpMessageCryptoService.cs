@@ -10,7 +10,7 @@ namespace ApiFoundation.Security.Cryptography
     /// HTTP message 加/解密服務。
     /// 屬於本組件核心，不對外開放擴充。
     /// </summary>
-    internal interface IHttpMessageCryptoService
+    internal interface IHttpMessageCryptoService : IDisposable
     {
         HttpRequestMessage Encrypt(HttpRequestMessage plainRequest);
 
