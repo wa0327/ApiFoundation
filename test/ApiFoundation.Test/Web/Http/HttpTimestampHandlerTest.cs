@@ -1,8 +1,5 @@
 ﻿using System.Net.Http;
-using System.Web.Http;
 using ApiFoundation.Net.Http;
-using ApiFoundation.Security.Cryptography;
-using ApiFoundation.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
-using System.Threading.Tasks;
 using ApiFoundation.Security.Cryptography;
 
 namespace ApiFoundation.Net.Http
@@ -29,14 +27,7 @@ namespace ApiFoundation.Net.Http
 
         protected override HttpResponseMessage ProcessResponse(HttpResponseMessage response, CancellationToken cancellationToken)
         {
-            try
-            {
-                return this.messageCryptoService.Decrypt(response);
-            }
-            catch (Exception ex)
-            {
-                throw new BadMessageException(ex);
-            }
+            return this.messageCryptoService.Decrypt(response);
         }
     }
 }

@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 using ApiFoundation.Net.Http;
-using ApiFoundation.Utility;
 using ApiFoundation.Web.Http.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Web.Http
 {

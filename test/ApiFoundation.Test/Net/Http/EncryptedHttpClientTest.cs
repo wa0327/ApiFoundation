@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using ApiFoundation.Security.Cryptography;
-using ApiFoundation.Utility;
+﻿using System.Net.Http;
 using ApiFoundation.Web.Http.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Net.Http
 {

@@ -2,7 +2,7 @@
 using System.Net.Http;
 using ApiFoundation.Net.Http;
 
-namespace ApiFoundation.Utility
+namespace ApiFoundation.Net.Http
 {
     internal sealed class HttpClientWrapper : IDisposable
     {

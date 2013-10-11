@@ -52,6 +52,22 @@ namespace ApiFoundation.Security.Cryptography
         }
 
         [TestMethod]
+        [ExpectedException(typeof(InvalidSignatureException))]
+        public void DefaultCryptoServiceTest_Decrypt_BadSignature()
+        {
+            using (var target = new DefaultCryptoService("123456789012345678901234", "12345678", "1234567890"))
+            {
+                var timestamp = "201310041855";
+                var cipherText = "xRANotL/km4vWpPwPw6P1H8T2UXptwMGyFShVH/BmXsnv6E+pOTtfeOPfsbfap5TD1DfMTdOn94t1j/sk9NU984ESJn1wi2QEDmgR/SI3B4=";
+                string signature = "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678";
+                var cipher = Convert.FromBase64String(cipherText);
+
+                byte[] plain;
+                target.Decrypt(cipher, timestamp, signature, out plain);
+            }
+        }
+
+        [TestMethod]
         public void DefaultCryptoServiceTest_Encrypt_then_Decrypt()
         {
             using (var target = new DefaultCryptoService("123456789012345678901234", "12345678", "1234567890"))

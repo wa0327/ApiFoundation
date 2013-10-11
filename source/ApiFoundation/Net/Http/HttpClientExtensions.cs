@@ -63,7 +63,7 @@ namespace ApiFoundation.Net.Http
                 // model state errors
                 if (response.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    throw new BadInvocationException(httpError);
+                    throw new InvalidModelException(httpError);
                 }
 
                 // handled error

@@ -108,12 +108,12 @@
     <Compile Include="Net\Http\HttpClientExtensionsTest.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Utility\EncryptedHttpClientWrapper.cs" />
-    <Compile Include="Utility\EncryptedHttpServerWrapper.cs" />
-    <Compile Include="Utility\HttpClientWrapper.cs" />
+    <Compile Include="Net\Http\EncryptedHttpClientWrapper.cs" />
+    <Compile Include="Web\Http\EncryptedHttpServerWrapper.cs" />
+    <Compile Include="Net\Http\HttpClientWrapper.cs" />
     <Compile Include="Web\Http\EncryptedHttpRouteTest.cs" />
-    <Compile Include="Utility\EncryptedHttpRouteWrapper.cs" />
-    <Compile Include="Utility\HttpServerWrapper.cs" />
+    <Compile Include="Web\Http\EncryptedHttpRouteWrapper.cs" />
+    <Compile Include="Web\Http\HttpServerWrapper.cs" />
     <Compile Include="Security\Cryptography\AESTest.cs" />
     <Compile Include="Security\Cryptography\DefaultCryptoServiceTest.cs" />
     <Compile Include="Web\Http\Filters\ExceptionFilterTest.cs" />

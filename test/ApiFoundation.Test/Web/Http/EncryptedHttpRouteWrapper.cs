@@ -6,7 +6,7 @@ using System.Web.Http.SelfHost;
 using ApiFoundation.Net.Http;
 using ApiFoundation.Web.Http;
 
-namespace ApiFoundation.Utility
+namespace ApiFoundation.Web.Http
 {
     internal sealed class EncryptedHttpRouteWrapper : IDisposable
     {

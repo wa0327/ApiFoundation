@@ -82,13 +82,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Net\Http\CipherTextNullException.cs" />
     <Compile Include="Net\Http\ClientCryptoHandler.cs" />
     <Compile Include="Net\Http\HttpClientExtensions.cs" />
+    <Compile Include="Net\Http\HttpContentNullException.cs" />
+    <Compile Include="Net\Http\InvalidCipherTextException.cs" />
+    <Compile Include="Net\Http\InvalidSignatureException.cs" />
+    <Compile Include="Net\Http\SignatureNullException.cs" />
+    <Compile Include="Net\Http\TimestampNullException.cs" />
     <Compile Include="Security\Cryptography\AES.cs" />
     <Compile Include="Net\Http\DefaultHttpMessageCryptoService.cs" />
     <Compile Include="Net\Http\HttpTimestampProvider.cs" />
     <Compile Include="Security\Cryptography\IHashAlgorithm.cs" />
-    <Compile Include="Security\Cryptography\InvalidHttpContentException.cs" />
+    <Compile Include="Net\Http\InvalidHttpMessageException.cs" />
     <Compile Include="Security\Cryptography\ISymmetricAlgorithm.cs" />
     <Compile Include="Net\Http\DefaultTimestampProvider.cs" />
     <Compile Include="Net\Http\InvalidTimestampException.cs" />
@@ -101,8 +107,7 @@
     <Compile Include="Security\Cryptography\DefaultCryptoService.cs" />
     <Compile Include="Security\Cryptography\ICryptoService.cs" />
     <Compile Include="Security\Cryptography\InvalidSignatureException.cs" />
-    <Compile Include="Net\Http\BadMessageException.cs" />
-    <Compile Include="Net\Http\BadInvocationException.cs" />
+    <Compile Include="Net\Http\InvalidModelException.cs" />
     <Compile Include="Web\Http\ServerCryptoHandler.cs" />
     <Compile Include="Web\Http\Filters\ExceptionEventArgs.cs" />
     <Compile Include="Net\Http\HttpServiceException.cs" />

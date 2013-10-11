@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Net.Http;
-using System.Web.Http;
 using ApiFoundation.Net.Http;
-using ApiFoundation.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ApiFoundation.Web.Http.Filters

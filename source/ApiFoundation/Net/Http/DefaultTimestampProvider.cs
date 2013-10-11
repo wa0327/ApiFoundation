@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace ApiFoundation.Net.Http
 {
@@ -27,24 +28,27 @@ namespace ApiFoundation.Net.Http
 
         void ITimestampProvider<long>.Validate(long timestamp)
         {
+            DateTime target;
             try
             {
-                var now = DateTime.UtcNow;
-                var expires = now.Add(this.duration);
-                DateTime target;
-
                 target = new DateTime(timestamp);
-                if (now.Ticks > target.Ticks && target < expires)
-                {
-                    return;
-                }
+                Trace.TraceInformation("Target: {0:yyyy/MM/dd HH:mm:ss.ffff}", target);
             }
             catch (Exception ex)
             {
-                throw new InvalidTimestampException(ex);
+                throw new InvalidTimestampException(timestamp.ToString(), ex);
             }
 
-            throw new InvalidTimestampException();
+            var now = DateTime.UtcNow;
+            Trace.TraceInformation("Now: {0:yyyy/MM/dd HH:mm:ss.ffff}", now);
+
+            var expires = target.Add(this.duration);
+            Trace.TraceInformation("Expires: {0:yyyy/MM/dd HH:mm:ss.ffff}", expires);
+
+            if (now < target || now >= expires)
+            {
+                throw new InvalidTimestampException(timestamp.ToString());
+            }
         }
     }
 }

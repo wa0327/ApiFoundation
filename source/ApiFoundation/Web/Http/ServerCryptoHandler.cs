@@ -39,14 +39,7 @@ namespace ApiFoundation.Web.Http
 
         protected override HttpRequestMessage ProcessRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            try
-            {
-                return this.messageCryptoService.Decrypt(request);
-            }
-            catch (Exception ex)
-            {
-                throw new BadMessageException(ex);
-            }
+            return this.messageCryptoService.Decrypt(request);
         }
 
         protected override HttpResponseMessage ProcessResponse(HttpResponseMessage response, CancellationToken cancellationToken)

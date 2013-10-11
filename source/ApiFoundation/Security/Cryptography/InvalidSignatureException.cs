@@ -7,5 +7,9 @@ namespace ApiFoundation.Security.Cryptography
 {
     public sealed class InvalidSignatureException : Exception
     {
+        public InvalidSignatureException()
+            : base("The signature is not a legal hashed string.")
+        {
+        }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System.Net.Http;
-using System.Web.Http;
 using ApiFoundation.Net.Http;
-using ApiFoundation.Utility;
 using ApiFoundation.Web.Http.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -36,7 +34,7 @@ namespace ApiFoundation.Web.Http.Filters
 
                     Assert.Fail("Did not throw expected exception BadInvocationException.");
                 }
-                catch (BadInvocationException ex)
+                catch (InvalidModelException ex)
                 {
                     Assert.IsNotNull(ex.ModelState);
                     Assert.AreEqual("The UserId field is required.", ex.ModelState["request.UserId"][0]);

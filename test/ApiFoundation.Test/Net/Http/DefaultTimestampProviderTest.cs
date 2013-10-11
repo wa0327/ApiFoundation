@@ -28,18 +28,18 @@ namespace ApiFoundation.Net.Http
         [TestMethod]
         public void DefaultTimestampProviderTest_Validate()
         {
-            var input = DateTime.UtcNow.AddMinutes(1).Ticks;
+            var input = DateTime.UtcNow.AddMinutes(-1).Ticks;
 
-            ITimestampProvider<long> target = new DefaultTimestampProvider(TimeSpan.FromMinutes(1));
+            ITimestampProvider<long> target = new DefaultTimestampProvider(TimeSpan.FromMinutes(2));
 
             target.Validate(input);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
-        public void DefaultTimestampProviderTest_Validate_ExpiredTimestamp()
+        public void DefaultTimestampProviderTest_ExpiredTimestamp()
         {
-            var input = DateTime.UtcNow.AddMinutes(-2).Ticks;
+            var input = DateTime.UtcNow.AddMinutes(-1).Ticks;
 
             ITimestampProvider<long> target = new DefaultTimestampProvider(TimeSpan.FromMinutes(1));
 
@@ -48,7 +48,7 @@ namespace ApiFoundation.Net.Http
 
         [TestMethod]
         [ExpectedException(typeof(InvalidTimestampException))]
-        public void DefaultTimestampProviderTest_Validate_InvalidTimestamp()
+        public void DefaultTimestampProviderTest_InvalidTimestamp()
         {
             var input = DateTime.UtcNow.AddMinutes(2).Ticks;
 

@@ -1,28 +1,28 @@
 ﻿using System;
-using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Dispatcher;
 using System.Web.Http.SelfHost;
-using ApiFoundation.Security.Cryptography;
+using ApiFoundation.Net.Http;
 using ApiFoundation.Web.Http;
 
-namespace ApiFoundation.Utility
+namespace ApiFoundation.Web.Http
 {
-    internal sealed class HttpServerWrapper : IDisposable
+    internal sealed class EncryptedHttpServerWrapper : IDisposable
     {
         private readonly HttpConfiguration configuration;
         private readonly HttpSelfHostServer inner;
 
-        internal HttpServerWrapper(string baseAddress)
+        internal EncryptedHttpServerWrapper(string baseAddress)
         {
             var configuration = new HttpSelfHostConfiguration(baseAddress);
 
             // arrange.
-            var injection = new DelegatingHandler[] { new ServerMessageDumper() };
-            var handler = HttpClientFactory.CreatePipeline(new HttpControllerDispatcher(configuration), injection);
+            var timestampProvider = new DefaultTimestampProvider(TimeSpan.FromMinutes(15));
+            var cryptoHandler = new ServerCryptoHandler("secretKeyPassword", "initialVectorPassword", "hashKeyString", timestampProvider);
 
-            // register HTTP route.
-            configuration.Routes.MapHttpRoute("API Default", "api/{controller}/{action}", null, null, handler);
+            // register handlers.
+            configuration.MessageHandlers.Add(new ServerMessageDumper());
+            configuration.MessageHandlers.Add(new HttpTimestampHandler<long>(configuration, "api2/!timestamp!/get", timestampProvider));
+            configuration.Routes.MapHttpRoute("Fake Timestamp Route", "api2/!timestamp!/{action}");
 
             // startup local HTTP server.
             this.inner = new HttpSelfHostServer(configuration);
@@ -31,7 +31,7 @@ namespace ApiFoundation.Utility
             this.configuration = configuration;
         }
 
-        internal HttpServerWrapper()
+        internal EncryptedHttpServerWrapper()
             : this("http://localhost:8591")
         {
         }

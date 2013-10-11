@@ -81,7 +81,7 @@ namespace ApiFoundation.Net.Http
             var plainContent = plainRequest.Content;
             if (plainContent == null)
             {
-                Trace.TraceWarning("Content of request message is NULL, replace to ALTERNATIVES!");
+                Trace.TraceWarning("Content of request is NULL, replace to ALTERNATIVES!");
                 plainContent = DefaultHttpMessageCryptoService.EmptyContentAlternatives;
             }
 
@@ -92,17 +92,11 @@ namespace ApiFoundation.Net.Http
             string signature;
             this.cryptoService.Encrypt(plain, timestamp.ToString(), out cipher, out signature);
 
-            var message = new
-            {
-                Timestamp = timestamp,
-                CipherText = Convert.ToBase64String(cipher),
-                Signature = signature,
-            };
+            var cipherModel = this.CreateCipherModel(timestamp, cipher, signature);
+            var cipherContent = new ObjectContent(cipherModel.GetType(), cipherModel, DefaultHttpMessageCryptoService.DefaultFormatter);
+            Trace.TraceInformation("Encrypted request content: {0}", cipherContent.ReadAsStringAsync().Result);
 
-            var encryptedContent = new ObjectContent(message.GetType(), message, DefaultHttpMessageCryptoService.DefaultFormatter);
-            Trace.TraceInformation("Encrypted request content: {0}", encryptedContent.ReadAsStringAsync().Result);
-
-            plainRequest.Content = encryptedContent;
+            plainRequest.Content = cipherContent;
             plainRequest.Content.Headers.ContentType = plainContent.Headers.ContentType; // keep source content type
 
             this.lastTimestamp = timestamp;
@@ -121,31 +115,36 @@ namespace ApiFoundation.Net.Http
             byte[] plain;
             try
             {
-                // !!! NO empty encrypted message !!!
-                var message = cipherContent.ReadAsAsync<JObject>().Result;
-                var timestamp = (long)message["Timestamp"];
-                var cipher = Convert.FromBase64String((string)message["CipherText"]);
-                var signature = (string)message["Signature"];
+                if (cipherContent == null)
+                {
+                    throw new HttpContentNullException();
+                }
 
+                var cipherModel = cipherContent.ReadAsAsync<JObject>().Result;
+
+                long timestamp;
+                byte[] cipher;
+                string signature;
+                this.ParseCipherModel(cipherModel, out timestamp, out cipher, out signature);
                 this.timestampProvider.Validate(timestamp);
                 this.cryptoService.Decrypt(cipher, timestamp.ToString(), signature, out plain);
 
-                this.lastTimestamp = timestamp;
+                this.lastTimestamp = timestamp; // keep timestamp for decrypting response.
             }
             catch (Exception ex)
             {
-                throw new InvalidHttpContentException(ex);
+                throw new InvalidHttpMessageException(ex);
             }
 
             if (DefaultHttpMessageCryptoService.IsEmptyContent(plain))
             {
-                Trace.TraceWarning("Content of request message is ALTERNATIVES, replace to NULL!");
+                Trace.TraceWarning("Content of request is ALTERNATIVES, replace to NULL!");
                 cipherRequest.Content = null;
             }
             else
             {
                 var decryptedContent = new ByteArrayContent(plain);
-                Trace.TraceInformation("Encrypted request content: {0}", decryptedContent.ReadAsStringAsync().Result);
+                Trace.TraceInformation("Decrypted request content: {0}", decryptedContent.ReadAsStringAsync().Result);
 
                 cipherRequest.Content = decryptedContent;
                 cipherRequest.Content.Headers.ContentType = cipherContent.Headers.ContentType;
@@ -164,7 +163,7 @@ namespace ApiFoundation.Net.Http
             var plainContent = plainResponse.Content;
             if (plainContent == null)
             {
-                Trace.TraceWarning("Content of response message is NULL, replace to ALTERNATIVES!");
+                Trace.TraceWarning("Content of response is NULL, replace to ALTERNATIVES!");
                 plainContent = DefaultHttpMessageCryptoService.EmptyContentAlternatives;
                 plainResponse.StatusCode = HttpStatusCode.OK;
             }
@@ -175,17 +174,11 @@ namespace ApiFoundation.Net.Http
             string signature;
             this.cryptoService.Encrypt(plain, timestamp.ToString(), out cipher, out signature);
 
-            var message = new
-            {
-                Timestamp = timestamp,
-                CipherText = Convert.ToBase64String(cipher),
-                Signature = signature,
-            };
+            var cipherModel = this.CreateCipherModel(timestamp, cipher, signature);
+            var cipherContent = new ObjectContent(cipherModel.GetType(), cipherModel, DefaultHttpMessageCryptoService.DefaultFormatter);
+            Trace.TraceInformation("Encrypted response content: {0}", cipherContent.ReadAsStringAsync().Result);
 
-            var encryptedContent = new ObjectContent(message.GetType(), message, DefaultHttpMessageCryptoService.DefaultFormatter);
-            Trace.TraceInformation("Encrypted response content: {0}", encryptedContent.ReadAsStringAsync().Result);
-
-            plainResponse.Content = encryptedContent;
+            plainResponse.Content = cipherContent;
             plainResponse.Content.Headers.ContentType = plainContent.Headers.ContentType;
 
             return plainResponse;
@@ -202,42 +195,121 @@ namespace ApiFoundation.Net.Http
             byte[] plain;
             try
             {
-                // !!! NO empty encrypted message !!!
-                var message = cipherContent.ReadAsAsync<JObject>().Result;
-                var timestamp = (long)message["Timestamp"];
-                var cipher = Convert.FromBase64String((string)message["CipherText"]);
-                var signature = (string)message["Signature"];
+                if (cipherContent == null)
+                {
+                    throw new HttpContentNullException();
+                }
 
+                var cipherModel = cipherContent.ReadAsAsync<JObject>().Result;
+
+                long timestamp;
+                byte[] cipher;
+                string signature;
+                this.ParseCipherModel(cipherModel, out timestamp, out cipher, out signature);
                 this.cryptoService.Decrypt(cipher, timestamp.ToString(), signature, out plain);
 
                 if (timestamp != this.lastTimestamp)
                 {
-                    throw new InvalidTimestampException();
+                    throw new InvalidTimestampException(timestamp.ToString());
                 }
-
-                this.lastTimestamp = timestamp;
             }
             catch (Exception ex)
             {
-                throw new InvalidHttpContentException(ex);
+                throw new InvalidHttpMessageException(ex);
             }
 
             if (DefaultHttpMessageCryptoService.IsEmptyContent(plain))
             {
-                Trace.TraceWarning("Content of response message is ALTERNATIVES, replace to NULL!");
+                Trace.TraceWarning("Content of response is ALTERNATIVES, replace to NULL!");
                 cipherResponse.Content = null;
                 cipherResponse.StatusCode = HttpStatusCode.NoContent;
             }
             else
             {
                 var decryptedContent = new ByteArrayContent(plain);
-                Trace.TraceInformation("Encrypted response content: {0}", decryptedContent.ReadAsStringAsync().Result);
+                Trace.TraceInformation("Decrypted response content: {0}", decryptedContent.ReadAsStringAsync().Result);
 
                 cipherResponse.Content = decryptedContent;
                 cipherResponse.Content.Headers.ContentType = cipherContent.Headers.ContentType;
             }
 
             return cipherResponse;
+        }
+
+        private JObject CreateCipherModel(long timestamp, byte[] cipher, string signature)
+        {
+            if (cipher == null)
+            {
+                throw new ArgumentNullException("cipher");
+            }
+
+            if (signature == null)
+            {
+                throw new ArgumentNullException("signature");
+            }
+
+            var model = new JObject();
+            model["Timestamp"] = timestamp;
+            model["CipherText"] = Convert.ToBase64String(cipher);
+            model["Signature"] = signature;
+
+            return model;
+        }
+
+        private void ParseCipherModel(JObject model, out long timestamp, out byte[] cipher, out string signature)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException("model");
+            }
+
+            JValue timestampToken = model["Timestamp"] as JValue;
+            if (timestampToken == null || timestampToken.Value == null)
+            {
+                throw new TimestampNullException();
+            }
+
+            var cipherTextToken = model["CipherText"] as JValue;
+            if (cipherTextToken == null || cipherTextToken.Value == null)
+            {
+                throw new CipherTextNullException();
+            }
+
+            var signatureToken = model["Signature"] as JValue;
+            if (signatureToken == null || signatureToken.Value == null)
+            {
+                throw new SignatureNullException();
+            }
+
+            try
+            {
+                timestamp = timestampToken.Value<long>();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidTimestampException(timestampToken.Value<string>(), ex);
+            }
+
+            var cipherText = cipherTextToken.Value<string>();
+            if (cipherText.Length == 0)
+            {
+                throw new InvalidCipherTextException(cipherText);
+            }
+
+            try
+            {
+                cipher = Convert.FromBase64String(cipherText);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidCipherTextException(cipherText, ex);
+            }
+
+            signature = signatureToken.Value<string>();
+            if (signature.Length != 128)
+            {
+                throw new InvalidSignatureException(signature);
+            }
         }
     }
 }
