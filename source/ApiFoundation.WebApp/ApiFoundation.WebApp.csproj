@@ -203,6 +203,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Configuration\CryptoGraphySettings.cs" />
+    <Compile Include="Web\Http\Tracing\TraceWriter.cs" />
     <Compile Include="Web\MyHttpModule.cs" />
     <Compile Include="Web\MyHttpHandler.cs" />
     <Compile Include="Web\Http\Controllers\ApiServerTestController.cs" />
