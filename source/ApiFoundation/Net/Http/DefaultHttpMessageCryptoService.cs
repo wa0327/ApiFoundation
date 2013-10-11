@@ -9,6 +9,9 @@ using Newtonsoft.Json.Linq;
 
 namespace ApiFoundation.Net.Http
 {
+    /// <summary>
+    /// 預設的 HTTP message 加解密服務實作。
+    /// </summary>
     internal class DefaultHttpMessageCryptoService : IHttpMessageCryptoService
     {
         private static readonly MediaTypeFormatter DefaultFormatter;

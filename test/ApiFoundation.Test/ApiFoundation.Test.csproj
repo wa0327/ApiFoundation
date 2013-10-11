@@ -101,6 +101,9 @@
     <Compile Include="..\..\source\ApiFoundation.WebApp\Web\Http\ServerMessageDumper.cs">
       <Link>Web\Http\ServerMessageDumper.cs</Link>
     </Compile>
+    <Compile Include="..\..\source\ApiFoundation.WebApp\Web\Http\Tracing\TraceWriter.cs">
+      <Link>Web\Http\Tracing\TraceWriter.cs</Link>
+    </Compile>
     <Compile Include="Net\Http\ClientMessageDumper.cs" />
     <Compile Include="Net\Http\DefaultHttpMessageCryptoServiceTest.cs" />
     <Compile Include="Net\Http\DefaultTimestampProviderTest.cs" />

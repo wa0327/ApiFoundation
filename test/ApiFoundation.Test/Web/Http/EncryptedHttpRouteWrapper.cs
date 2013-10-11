@@ -3,8 +3,9 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Http.SelfHost;
+using System.Web.Http.Tracing;
 using ApiFoundation.Net.Http;
-using ApiFoundation.Web.Http;
+using ApiFoundation.Web.Http.Tracing;
 
 namespace ApiFoundation.Web.Http
 {
@@ -16,8 +17,10 @@ namespace ApiFoundation.Web.Http
         internal EncryptedHttpRouteWrapper(string baseAddress)
         {
             var configuration = new HttpSelfHostConfiguration(baseAddress);
-            ITimestampProvider<long> timestampProvider = new DefaultTimestampProvider(TimeSpan.FromMinutes(15));
 
+            configuration.Services.Replace(typeof(ITraceWriter), new TraceWriter());
+
+            ITimestampProvider<long> timestampProvider = new DefaultTimestampProvider(TimeSpan.FromMinutes(15));
             this.RegisterEncryptedRoute(configuration, timestampProvider);
             this.RegisterTimestampRoute(configuration, timestampProvider);
 
