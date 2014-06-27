@@ -7,7 +7,7 @@ namespace ApiFoundation.Net.Http
     /// HTTP message 加/解密服務。
     /// 屬於本組件核心，不對外開放擴充。
     /// </summary>
-    internal interface IHttpMessageCryptoService : IDisposable
+    public interface IHttpMessageCryptoService : IDisposable
     {
         /// <summary>
         /// Encrypts the specified plain request.

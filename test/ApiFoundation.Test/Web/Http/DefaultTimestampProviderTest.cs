@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ApiFoundation.Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ApiFoundation.Net.Http
+namespace ApiFoundation.Web.Http
 {
     [TestClass]
     public class DefaultTimestampProviderTest

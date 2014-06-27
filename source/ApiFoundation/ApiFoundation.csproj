@@ -96,7 +96,7 @@
     <Compile Include="Security\Cryptography\IHashAlgorithm.cs" />
     <Compile Include="Net\Http\InvalidHttpMessageException.cs" />
     <Compile Include="Security\Cryptography\ISymmetricAlgorithm.cs" />
-    <Compile Include="Net\Http\DefaultTimestampProvider.cs" />
+    <Compile Include="Web\Http\DefaultTimestampProvider.cs" />
     <Compile Include="Net\Http\InvalidTimestampException.cs" />
     <Compile Include="Net\Http\ITimestampProvider.cs" />
     <Compile Include="Web\Http\HttpRouteCollectionExtensions.cs" />

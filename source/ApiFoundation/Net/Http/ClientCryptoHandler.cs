@@ -1,6 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading;
-using ApiFoundation.Security.Cryptography;
 
 namespace ApiFoundation.Net.Http
 {
@@ -8,16 +8,14 @@ namespace ApiFoundation.Net.Http
     {
         private readonly IHttpMessageCryptoService messageCryptoService;
 
-        public ClientCryptoHandler(ICryptoService cryptoService, ITimestampProvider<long> timestampProvider)
+        public ClientCryptoHandler(IHttpMessageCryptoService messageCryptoService)
         {
-            this.messageCryptoService = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider);
-        }
+            if (messageCryptoService == null)
+            {
+                throw new ArgumentNullException("messageCryptoService");
+            }
 
-        public ClientCryptoHandler(string secretKeyPassword, string initialVectorPassword, string hashKeyString, ITimestampProvider<long> timestampProvider)
-        {
-            var cryptoService = new DefaultCryptoService(secretKeyPassword, initialVectorPassword, hashKeyString);
-
-            this.messageCryptoService = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider);
+            this.messageCryptoService = messageCryptoService;
         }
 
         protected override HttpRequestMessage ProcessRequest(HttpRequestMessage request, CancellationToken cancellationToken)

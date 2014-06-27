@@ -10,31 +10,23 @@ namespace ApiFoundation.Web.Http
     {
         private readonly IHttpMessageCryptoService messageCryptoService;
 
-        public ServerCryptoHandler(ICryptoService cryptoService, ITimestampProvider<long> timestampProvider)
+        public ServerCryptoHandler(IHttpMessageCryptoService messageCryptoService)
         {
-            if (cryptoService == null)
+            if (messageCryptoService == null)
             {
-                throw new ArgumentNullException("cryptoService");
+                throw new ArgumentNullException("messageCryptoService");
             }
 
-            if (timestampProvider == null)
-            {
-                throw new ArgumentNullException("timestampProvider");
-            }
-
-            this.messageCryptoService = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider);
+            this.messageCryptoService = messageCryptoService;
         }
 
-        public ServerCryptoHandler(string secretKeyPassword, string initialVectorPassword, string hashKeyString, ITimestampProvider<long> timestampProvider)
+        public ServerCryptoHandler(string secretKeyPassword, string initialVectorPassword, string hashKeyString)
         {
-            if (timestampProvider == null)
-            {
-                throw new ArgumentNullException("timestampProvider");
-            }
+            var symmetricAlgorithm = new AES(secretKeyPassword, initialVectorPassword);
+            var hashAlgorithm = new HMACSHA512(hashKeyString);
+            var timestampProvider = new DefaultTimestampProvider(TimeSpan.FromMinutes(15)) as ITimestampProvider<string>;
 
-            var cryptoService = new DefaultCryptoService(secretKeyPassword, initialVectorPassword, hashKeyString);
-
-            this.messageCryptoService = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider);
+            this.messageCryptoService = new DefaultHttpMessageCryptoService(symmetricAlgorithm, hashAlgorithm, timestampProvider);
         }
 
         protected override HttpRequestMessage ProcessRequest(HttpRequestMessage request, CancellationToken cancellationToken)

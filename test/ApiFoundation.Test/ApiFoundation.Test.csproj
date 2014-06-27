@@ -106,7 +106,8 @@
     </Compile>
     <Compile Include="Net\Http\ClientMessageDumper.cs" />
     <Compile Include="Net\Http\DefaultHttpMessageCryptoServiceTest.cs" />
-    <Compile Include="Net\Http\DefaultTimestampProviderTest.cs" />
+    <Compile Include="Net\Http\DefaultHttpMessageCryptoServiceWrapper.cs" />
+    <Compile Include="Web\Http\DefaultTimestampProviderTest.cs" />
     <Compile Include="Net\Http\EncryptedHttpClientTest.cs" />
     <Compile Include="Net\Http\HttpClientExtensionsTest.cs">
       <SubType>Code</SubType>

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using ApiFoundation.Net.Http;
 
-namespace ApiFoundation.Net.Http
+namespace ApiFoundation.Web.Http
 {
-    public class DefaultTimestampProvider : ITimestampProvider<long>
+    public class DefaultTimestampProvider : ITimestampProvider<string>
     {
         private TimeSpan duration;
 
@@ -21,17 +22,18 @@ namespace ApiFoundation.Net.Http
         {
         }
 
-        long ITimestampProvider<long>.GetTimestamp()
+        string ITimestampProvider<string>.GetTimestamp()
         {
-            return DateTime.UtcNow.Ticks;
+            return DateTime.UtcNow.Ticks.ToString();
         }
 
-        void ITimestampProvider<long>.Validate(long timestamp)
+        void ITimestampProvider<string>.Validate(string timestamp)
         {
             DateTime target;
             try
             {
-                target = new DateTime(timestamp);
+                var ticks = long.Parse(timestamp);
+                target = new DateTime(ticks);
                 Trace.TraceInformation("Target: {0:yyyy/MM/dd HH:mm:ss.ffff}", target);
             }
             catch (Exception ex)

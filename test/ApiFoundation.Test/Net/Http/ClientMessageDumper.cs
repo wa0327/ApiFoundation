@@ -10,7 +10,7 @@ namespace ApiFoundation.Net.Http
         protected override HttpRequestMessage ProcessRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var builder = new StringBuilder();
-            builder.AppendFormat("[SEND {0}]", request.RequestUri);
+            builder.AppendFormat("[Send Request {0}]", request.RequestUri);
 
             var content = request.Content;
             if (content != null)
@@ -38,7 +38,7 @@ namespace ApiFoundation.Net.Http
         protected override HttpResponseMessage ProcessResponse(HttpResponseMessage response, CancellationToken cancellationToken)
         {
             var builder = new StringBuilder();
-            builder.AppendFormat("[RECV {0} {1}]", response.StatusCode, response.RequestMessage.RequestUri);
+            builder.AppendFormat("[Receive Response {0} {1}]", response.StatusCode, response.RequestMessage.RequestUri);
 
             var content = response.Content;
             if (content != null)

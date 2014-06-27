@@ -29,13 +29,12 @@ namespace ApiFoundation.Net.Http
                 Content = null
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
             timestampProvider
                 .Stub(o => o.GetTimestamp())
-                .Return(12345);
+                .Return("12345");
 
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 var actual = target.Encrypt(input);
                 Assert.IsNotNull(actual);
@@ -64,12 +63,11 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
             timestampProvider
-                .Stub(o => o.Validate(Arg<long>.Is.Equal(12345)));
+                .Stub(o => o.Validate(Arg<string>.Is.Equal("12345")));
 
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 var actual = target.Decrypt(input);
                 Assert.IsNotNull(actual);
@@ -85,9 +83,8 @@ namespace ApiFoundation.Net.Http
                 Content = null
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 var po = new PrivateObject(target);
                 po.SetField("lastTimestamp", 12345);
@@ -119,9 +116,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 var po = new PrivateObject(target);
                 po.SetField("lastTimestamp", 12345);
@@ -152,13 +148,12 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(plainContent.GetType(), plainContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
             timestampProvider
                 .Stub(o => o.GetTimestamp())
-                .Return(12345);
+                .Return("12345");
 
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 var actual = target.Encrypt(input);
                 Assert.IsNotNull(actual);
@@ -187,12 +182,11 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
             timestampProvider
-                .Stub(o => o.Validate(Arg<long>.Is.Equal(12345)));
+                .Stub(o => o.Validate(Arg<string>.Is.Equal("12345")));
 
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 var actual = target.Decrypt(input);
                 Assert.IsNotNull(actual);
@@ -221,9 +215,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(plainContent.GetType(), plainContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 var po = new PrivateObject(target);
                 po.SetField("lastTimestamp", 12345);
@@ -255,9 +248,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 var po = new PrivateObject(target);
                 po.SetField("lastTimestamp", 12345);
@@ -289,9 +281,8 @@ namespace ApiFoundation.Net.Http
                 Content = null
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -320,9 +311,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -352,9 +342,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -384,9 +373,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -419,9 +407,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -454,9 +441,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -486,9 +472,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -518,9 +503,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -553,9 +537,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -588,9 +571,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -620,9 +602,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -652,9 +633,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -687,9 +667,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -715,9 +694,8 @@ namespace ApiFoundation.Net.Http
                 Content = null
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -746,9 +724,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -778,9 +755,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -810,9 +786,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -845,9 +820,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -880,9 +854,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -912,9 +885,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -944,9 +916,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -979,9 +950,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -1014,9 +984,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -1046,9 +1015,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -1078,9 +1046,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {
@@ -1113,9 +1080,8 @@ namespace ApiFoundation.Net.Http
                 Content = new ObjectContent(cipherContent.GetType(), cipherContent, new JsonMediaTypeFormatter())
             };
 
-            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<long>>();
-            using (var cryptoService = new DefaultCryptoService("secretKeyPassword", "initialVectorPassword", "hashKeyString"))
-            using (var target = new DefaultHttpMessageCryptoService(cryptoService, timestampProvider))
+            var timestampProvider = MockRepository.GenerateStub<ITimestampProvider<string>>();
+            using (DefaultHttpMessageCryptoService target = new DefaultHttpMessageCryptoServiceWrapper(timestampProvider))
             {
                 try
                 {

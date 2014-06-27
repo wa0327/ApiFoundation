@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
@@ -12,7 +13,7 @@ namespace ApiFoundation.Net.Http
     /// <summary>
     /// 預設的 HTTP message 加解密服務實作。
     /// </summary>
-    internal class DefaultHttpMessageCryptoService : IHttpMessageCryptoService
+    public class DefaultHttpMessageCryptoService : IHttpMessageCryptoService
     {
         private static readonly MediaTypeFormatter DefaultFormatter;
         private static readonly HttpContent EmptyContentAlternatives;
@@ -48,17 +49,23 @@ namespace ApiFoundation.Net.Http
             return true;
         }
 
-        private readonly ICryptoService cryptoService;
-        private readonly ITimestampProvider<long> timestampProvider;
+        private readonly ISymmetricAlgorithm symmetricAlgorithm;
+        private readonly IHashAlgorithm hashAlgorithm;
+        private readonly ITimestampProvider<string> timestampProvider;
 
         [ThreadStatic]
-        private long lastTimestamp;
+        private string lastTimestamp;
 
-        internal DefaultHttpMessageCryptoService(ICryptoService cryptoService, ITimestampProvider<long> timestampProvider)
+        public DefaultHttpMessageCryptoService(ISymmetricAlgorithm symmetricAlgorithm, IHashAlgorithm hashAlgorithm, ITimestampProvider<string> timestampProvider)
         {
-            if (cryptoService == null)
+            if (symmetricAlgorithm == null)
             {
-                throw new ArgumentNullException("cryptoService");
+                throw new ArgumentNullException("symmetricAlgorithm");
+            }
+
+            if (hashAlgorithm == null)
+            {
+                throw new ArgumentNullException("hashAlgorithm");
             }
 
             if (timestampProvider == null)
@@ -66,12 +73,15 @@ namespace ApiFoundation.Net.Http
                 throw new ArgumentNullException("timestampProvider");
             }
 
-            this.cryptoService = cryptoService;
+            this.symmetricAlgorithm = symmetricAlgorithm;
+            this.hashAlgorithm = hashAlgorithm;
             this.timestampProvider = timestampProvider;
         }
 
         public void Dispose()
         {
+            this.symmetricAlgorithm.Dispose();
+            this.hashAlgorithm.Dispose();
         }
 
         public HttpRequestMessage Encrypt(HttpRequestMessage plainRequest)
@@ -93,7 +103,7 @@ namespace ApiFoundation.Net.Http
 
             byte[] cipher;
             string signature;
-            this.cryptoService.Encrypt(plain, timestamp.ToString(), out cipher, out signature);
+            this.Encrypt(plain, timestamp, out cipher, out signature);
 
             var cipherModel = this.CreateCipherModel(timestamp, cipher, signature);
             var cipherContent = new ObjectContent(cipherModel.GetType(), cipherModel, DefaultHttpMessageCryptoService.DefaultFormatter);
@@ -125,12 +135,12 @@ namespace ApiFoundation.Net.Http
 
                 var cipherModel = cipherContent.ReadAsAsync<JObject>().Result;
 
-                long timestamp;
+                string timestamp;
                 byte[] cipher;
                 string signature;
                 this.ParseCipherModel(cipherModel, out timestamp, out cipher, out signature);
                 this.timestampProvider.Validate(timestamp);
-                this.cryptoService.Decrypt(cipher, timestamp.ToString(), signature, out plain);
+                this.Decrypt(cipher, timestamp, signature, out plain);
 
                 this.lastTimestamp = timestamp; // keep timestamp for decrypting response.
             }
@@ -175,7 +185,7 @@ namespace ApiFoundation.Net.Http
             var timestamp = this.lastTimestamp;
             byte[] cipher;
             string signature;
-            this.cryptoService.Encrypt(plain, timestamp.ToString(), out cipher, out signature);
+            this.Encrypt(plain, timestamp, out cipher, out signature);
 
             var cipherModel = this.CreateCipherModel(timestamp, cipher, signature);
             var cipherContent = new ObjectContent(cipherModel.GetType(), cipherModel, DefaultHttpMessageCryptoService.DefaultFormatter);
@@ -205,15 +215,15 @@ namespace ApiFoundation.Net.Http
 
                 var cipherModel = cipherContent.ReadAsAsync<JObject>().Result;
 
-                long timestamp;
+                string timestamp;
                 byte[] cipher;
                 string signature;
                 this.ParseCipherModel(cipherModel, out timestamp, out cipher, out signature);
-                this.cryptoService.Decrypt(cipher, timestamp.ToString(), signature, out plain);
+                this.Decrypt(cipher, timestamp, signature, out plain);
 
                 if (timestamp != this.lastTimestamp)
                 {
-                    throw new InvalidTimestampException(timestamp.ToString());
+                    throw new InvalidTimestampException(timestamp);
                 }
             }
             catch (Exception ex)
@@ -239,7 +249,7 @@ namespace ApiFoundation.Net.Http
             return cipherResponse;
         }
 
-        private JObject CreateCipherModel(long timestamp, byte[] cipher, string signature)
+        private JObject CreateCipherModel(string timestamp, byte[] cipher, string signature)
         {
             if (cipher == null)
             {
@@ -259,7 +269,7 @@ namespace ApiFoundation.Net.Http
             return model;
         }
 
-        private void ParseCipherModel(JObject model, out long timestamp, out byte[] cipher, out string signature)
+        private void ParseCipherModel(JObject model, out string timestamp, out byte[] cipher, out string signature)
         {
             if (model == null)
             {
@@ -286,7 +296,7 @@ namespace ApiFoundation.Net.Http
 
             try
             {
-                timestamp = timestampToken.Value<long>();
+                timestamp = timestampToken.Value<string>();
             }
             catch (Exception ex)
             {
@@ -313,6 +323,67 @@ namespace ApiFoundation.Net.Http
             {
                 throw new InvalidSignatureException(signature);
             }
+        }
+
+        private void Encrypt(byte[] plain, string timestamp, out byte[] cipher, out string signature)
+        {
+            if (plain == null)
+            {
+                throw new ArgumentNullException("plain");
+            }
+
+            if (timestamp == null)
+            {
+                throw new ArgumentNullException("timestamp");
+            }
+
+            cipher = this.symmetricAlgorithm.Encrypt(plain);
+            signature = this.ComputeSignature(cipher, timestamp);
+        }
+
+        private void Decrypt(byte[] cipher, string timestamp, string signature, out byte[] plain)
+        {
+            if (cipher == null)
+            {
+                throw new ArgumentNullException("cipher");
+            }
+
+            if (timestamp == null)
+            {
+                throw new ArgumentNullException("timestamp");
+            }
+
+            if (signature == null)
+            {
+                throw new ArgumentNullException("signature");
+            }
+
+            var signature2 = this.ComputeSignature(cipher, timestamp);
+            if (signature != signature2)
+            {
+                throw new InvalidSignatureException(signature);
+            }
+
+            plain = this.symmetricAlgorithm.Decrypt(cipher);
+        }
+
+        private string ComputeSignature(byte[] cipher, string timestamp)
+        {
+            if (cipher == null)
+            {
+                throw new ArgumentNullException("cipher");
+            }
+
+            if (timestamp == null)
+            {
+                throw new ArgumentNullException("timestamp");
+            }
+
+            var hashBase = Convert.ToBase64String(cipher) + timestamp;
+            var hashBaseBytes = Encoding.UTF8.GetBytes(hashBase);
+            var hash = this.hashAlgorithm.ComputeHash(hashBaseBytes);
+
+            return string.Join(string.Empty, hash.Select(o => o.ToString("x2")));
         }
     }
 }

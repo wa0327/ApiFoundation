@@ -8,6 +8,7 @@ using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using ApiFoundation.Configuration;
 using ApiFoundation.Net.Http;
+using ApiFoundation.Security.Cryptography;
 using ApiFoundation.Web.Http;
 using ApiFoundation.Web.Http.Filters;
 
@@ -49,8 +50,7 @@ namespace ApiFoundation.Web
 
             // arrange.
             var settings = new CryptoGraphySettings(section);
-            ITimestampProvider<long> timestampProvider = new DefaultTimestampProvider(TimeSpan.FromMinutes(15));
-            var cryptoHandler = new ServerCryptoHandler(settings.SecretKey, settings.InitialVector, settings.HashKey, timestampProvider);
+            var cryptoHandler = new ServerCryptoHandler(settings.SecretKey, settings.InitialVector, settings.HashKey);
             var injection = new DelegatingHandler[] { new ServerMessageDumper(), cryptoHandler }; // dump decrypted request & plain response.
             var handler = HttpClientFactory.CreatePipeline(new HttpControllerDispatcher(configuration), injection);
 
@@ -58,11 +58,12 @@ namespace ApiFoundation.Web
             configuration.Routes.MapHttpRoute("Encrypted Route", "api2/{controller}/{action}", null, null, handler);
 
             // register timestamp as a route.
-            var timestampHandler = new HttpTimestampHandler<long>(timestampProvider);
+            var timestampProvider = new DefaultTimestampProvider(TimeSpan.FromMinutes(15)) as ITimestampProvider<string>;
+            var timestampHandler = new HttpTimestampHandler<string>(timestampProvider);
             configuration.Routes.MapHttpRoute("Timestamp Route", "api3/!timestamp!/get", null, null, timestampHandler);
 
             // register global timestamp service, it should align with encrypted HTTP route or will not work.
-            configuration.MessageHandlers.Add(new HttpTimestampHandler<long>(configuration, "api2/!timestamp!/get", timestampProvider));
+            configuration.MessageHandlers.Add(new HttpTimestampHandler<string>(configuration, "api2/!timestamp!/get", timestampProvider));
         }
     }
 }
